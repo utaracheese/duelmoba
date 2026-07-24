@@ -9,7 +9,7 @@ const HERO_PRESETS = {
             maxMana: 400,
             manaRegen: 1.8,
             ad: 10,
-            ap: 25,
+            ap: 50,
             attackSpeed: 0.65,
             speed: 4.2, 
             armor: 55,
@@ -20,7 +20,7 @@ const HERO_PRESETS = {
             lifesteal: 0,
             spellVamp: 0,
             critRate: 0,
-            critDamage: 0, // Đã chỉnh sửa gốc về 0%
+            critDamage: 0,
             expBonus: 0
         }
     }
@@ -98,7 +98,7 @@ class Entity {
         this.redBuffTime = 0;
 
         this.redBurnTimer = 0;
-        this.redBurnTickTimer = 0; // Đã thêm bộ đếm giây cho Red Buff
+        this.redBurnTickTimer = 0; 
         this.redBurnAttacker = null;
 
         this.level = 1;
@@ -119,7 +119,7 @@ class Entity {
         this.premiumJackpot = false;
 
         this.grievousWoundsTimer = 0;
-        this.erosionTickTimer = 0; // Bộ đếm giây của Gặm mòn
+        this.erosionTickTimer = 0; 
         this.erosionAttacker = null;
 
         this.accumulationPoints = 0;
@@ -127,12 +127,20 @@ class Entity {
         this.jackpotTimer = 0;
 
         this.chosenPremiumUpgrades = new Set();
+        this.redEmberParticles = [];
+
+        this.stunTimer = 0;
+        this.slowTimer = 0;
+        this.slowAmount = 0;
+        this.inButterDomain = false;
+
+        this.lightningMarkTimer = 0; // Đếm ngược 5s đánh dấu sét
+        this.doubleResistTimer = 0;   // Đếm ngược 2.5s nhận x2 Giáp và Kháng phép
     }
 
     takeDamage(amount, type, attacker = null, isCrit = false) {
         let finalDmg = amount;
-
-        // Guardian: Giảm 17.5% mọi sát thương nhận vào
+        
         if (this.premiumGuardian) {
             finalDmg *= 0.825;
         }
@@ -140,11 +148,25 @@ class Entity {
         let rawArmorPen = (attacker && attacker.stats) ? attacker.stats.armorPen : 0;
         let rawMagicPen = (attacker && attacker.stats) ? attacker.stats.magicPen : 0;
 
+        let effectiveArmorBase = this.stats.armor;
+        let effectiveMrBase = this.stats.mr;
+
+        // HIỆU ỨNG X2 GIÁP & KHÁNG PHÉP TỪ CHIÊU 2
+        if (this.doubleResistTimer > 0) {
+            effectiveArmorBase *= 2;
+            effectiveMrBase *= 2;
+        }
+
+        if (this.redBurnTimer > 0) {
+            effectiveArmorBase *= 0.85; 
+            effectiveMrBase *= 0.85;    
+        }
+
         if (type === 'physical') {
-            let effectiveArmor = Math.max(0, this.stats.armor - rawArmorPen);
+            let effectiveArmor = Math.max(0, effectiveArmorBase - rawArmorPen);
             finalDmg = finalDmg * (600 / (600 + effectiveArmor));
         } else if (type === 'magic') {
-            let effectiveMR = Math.max(0, this.stats.mr - rawMagicPen);
+            let effectiveMR = Math.max(0, effectiveMrBase - rawMagicPen);
             finalDmg = finalDmg * (600 / (600 + effectiveMR));
         }
 
@@ -155,11 +177,15 @@ class Entity {
 
         this.stats.hp = Math.max(0, this.stats.hp - finalDmg);
 
+        let dmgColor = type === 'physical' ? '#ff3333' : (type === 'magic' ? '#b388ff' : '#ffffff');
+        if (type === 'true') dmgColor = '#ffffff';
+
         gameState.damageTexts.push({
             x: this.x + (Math.random() - 0.5) * 30,
             y: this.y - this.radius - 10,
-            text: Math.round(finalDmg).toString() + (isCrit ? "!" : ""),
-            color: isCrit ? '#ff9100' : (type === 'physical' ? '#ff3333' : (type === 'magic' ? '#b388ff' : '#ffffff')),
+            text: Math.round(finalDmg).toString(),
+            color: dmgColor,
+            isCrit: isCrit,
             life: 1.0 
         });
 
@@ -177,19 +203,18 @@ class Entity {
     }
 
     applyRedBurn(attacker) {
-        this.redBurnTimer = 5.0; 
-        this.redBurnTickTimer = 0; // Reset bộ đếm giây của bùa đỏ
+        this.redBurnTimer = 5.0; // Reset thời gian thiêu đốt
         this.redBurnAttacker = attacker;
-    }
+    }    
 
     getSpeed() {
         let baseSpeed = this.stats.speed;
-        // Công thức Eye: nhân linh hoạt 110% cho tất cả tốc chạy hiện có và sau này
-        if (this.premiumEye) {
-            baseSpeed *= 1.10;
-        }
-        if (this.redBurnTimer > 0) {
-            baseSpeed *= 0.8; 
+        if (this.premiumEye) baseSpeed *= 1.10;
+        if (this.redBurnTimer > 0) baseSpeed *= 0.8; 
+
+        // Áp dụng làm chậm từ Lãnh Địa Bơ hoặc kỹ năng
+        if (this.slowTimer > 0) {
+            baseSpeed *= (1 - this.slowAmount);
         }
         return baseSpeed;
     }
@@ -202,6 +227,15 @@ class Entity {
             this.y += (this.targetY - this.y) * 0.25;
         }
         
+        gameState.player.inButterDomain = false; // Reset trạng thái mỗi frame
+        for (let i = gameState.butterDomains.length - 1; i >= 0; i--) {
+            let domain = gameState.butterDomains[i];
+            domain.update(dt);
+            if (domain.isExpired) {
+                gameState.butterDomains.splice(i, 1);
+            }
+        }
+
         if (this.shieldActive) {
             this.shieldTime -= dt;
             if (this.shieldTime <= 0) {
@@ -222,20 +256,52 @@ class Entity {
         if (this.blueBuffTime > 0) this.blueBuffTime = Math.max(0, this.blueBuffTime - dt);
         if (this.redBuffTime > 0) this.redBuffTime = Math.max(0, this.redBuffTime - dt);
 
-        // Đã cập nhật: Bùa đỏ gây sát thương mỗi giây một lần bằng 2% HP tối đa địch
+        // Bùa đỏ gây sát thương & hiệu ứng hạt lửa
         if (this.redBurnTimer > 0) {
             this.redBurnTimer -= dt;
             this.redBurnTickTimer += dt;
+
             if (this.redBurnTickTimer >= 1.0) {
                 this.redBurnTickTimer -= 1.0;
-                let trueDmgVal = this.stats.maxHp * 0.02;
-                this.takeDamage(trueDmgVal, 'true', this.redBurnAttacker);
+
+                let attackerLevel = (this.redBurnAttacker && this.redBurnAttacker.level) ? this.redBurnAttacker.level : 1;
+                let maxBaseDmg = 10 + (attackerLevel * 2);
+                let randomBaseDmg = 4 + Math.random() * (maxBaseDmg - 4);
+                let percentHpDmg = this.stats.maxHp * 0.02;
+
+                let totalTrueDmg = randomBaseDmg + percentHpDmg;
+                this.takeDamage(totalTrueDmg, 'true', this.redBurnAttacker, false);
+            }
+        
+            if (!this.redEmberParticles) this.redEmberParticles = [];
+            if (Math.random() < 0.5) {
+                this.redEmberParticles.push({
+                    x: this.x + (Math.random() - 0.5) * this.radius * 1.6,
+                    y: this.y + (Math.random() - 0.5) * this.radius * 1.6,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: -Math.random() * 2 - 1,
+                    size: 2 + Math.random() * 3,
+                    alpha: 1.0,
+                    life: 0.3 + Math.random() * 0.3
+                });
             }
         } else {
             this.redBurnTickTimer = 0;
         }
 
-        // Đã cập nhật: Xử lý sát thương theo giây của Gặm mòn (Erosion DoT)
+        if (this.redEmberParticles && this.redEmberParticles.length > 0) {
+            for (let i = this.redEmberParticles.length - 1; i >= 0; i--) {
+                let p = this.redEmberParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= dt / p.life;
+                if (p.alpha <= 0) {
+                    this.redEmberParticles.splice(i, 1);
+                }
+            }
+        }
+
+        // Gặm mòn (Erosion DoT)
         if (this.grievousWoundsTimer > 0) {
             this.grievousWoundsTimer = Math.max(0, this.grievousWoundsTimer - dt);
             if (this.erosionAttacker) {
@@ -246,7 +312,6 @@ class Entity {
                     let attAp = this.erosionAttacker.stats.ap || 0;
                     let attMaxHp = this.erosionAttacker.stats.maxHp || 0;
                     let erosionDmg = (attAd * 0.025) + (attAp * 0.025) + (attMaxHp * 0.015);
-                    // Gây sát thương phép, sát thương này không kích hoạt lại điểm gây hiệu ứng gặm mòn
                     this.takeDamage(erosionDmg, 'magic', this.erosionAttacker, false);
                 }
             }
@@ -255,7 +320,6 @@ class Entity {
             this.erosionAttacker = null;
         }
 
-        // Guardian: Tự động hồi 1.5% HP tối đa mỗi giây
         if (this.premiumGuardian && this.stats.hp > 0 && this.stats.hp < this.stats.maxHp) {
             this.heal((this.stats.maxHp * 0.015) * dt);
         }
@@ -285,6 +349,10 @@ class Entity {
                 addXp(this, Math.max(1, gain));
             }
         }
+        if (this.lightningMarkTimer > 0) this.lightningMarkTimer = Math.max(0, this.lightningMarkTimer - dt);
+        if (this.doubleResistTimer > 0) this.doubleResistTimer = Math.max(0, this.doubleResistTimer - dt);
+        if (this.stunTimer > 0) this.stunTimer = Math.max(0, this.stunTimer - dt);
+        if (this.slowTimer > 0) this.slowTimer = Math.max(0, this.slowTimer - dt);
     }
 
     draw() {
@@ -310,6 +378,67 @@ class Entity {
         ctx.fillStyle = "#333";
         ctx.fillRect(this.radius - 6, -6, 8, 12);
         ctx.restore();
+
+        // HIỆU ỨNG XOÁY CHOÁNG TRÊN ĐỈNH ĐẦU KHI BỊ CHOÁNG
+        if (this.stunTimer > 0) {
+            ctx.save();
+            let headX = this.x;
+            let headY = this.y - this.radius - 18;
+            let time = performance.now() * 0.008;
+
+            for (let i = 0; i < 3; i++) {
+                let a = time + (i * Math.PI * 2 / 3);
+                let sx = headX + Math.cos(a) * 12;
+                let sy = headY + Math.sin(a) * 5;
+                
+                ctx.fillStyle = "#ffeb3b";
+                ctx.beginPath();
+                ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = "rgba(255, 235, 59, 0.6)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        if (this.redEmberParticles && this.redEmberParticles.length > 0) {
+            this.redEmberParticles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.fillStyle = Math.random() > 0.3 ? "#ff5722" : "#ffeb3b";
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        // HIỆU ỨNG HIỂN THỊ TIA ĐIỆN ĐÁNH DẤU TRÊN ĐẦU
+        if (this.lightningMarkTimer > 0) {
+            ctx.save();
+            let markX = this.x;
+            let markY = this.y - this.radius - 22;
+
+            ctx.translate(markX, markY);
+            ctx.beginPath();
+            ctx.moveTo(-2, -10);
+            ctx.lineTo(4, -2);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(5, 8);
+            ctx.lineTo(-4, 1);
+            ctx.lineTo(0, -1);
+            ctx.closePath();
+        
+            ctx.fillStyle = "#00e5ff";
+            ctx.shadowColor = "#00e5ff";
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 }
 
@@ -373,15 +502,23 @@ class Projectile {
             this.lastTick += dt;
             if (this.lastTick >= 0.25) {
                 this.lastTick = 0;
-                
+
                 gameState.entities.forEach(entity => {
                     if (entity !== this.owner) {
                         let dist = Math.hypot(entity.x - this.x, entity.y - this.y);
                         if (dist <= this.zapRadius) { 
                             let apDmg = (this.owner ? (this.owner.stats.ad * 0.1) + (this.owner.stats.ap * 0.25) : 10);
-                            
+
                             let actualDmg = entity.takeDamage(apDmg, 'magic', this.owner, false);
-                            
+
+                            // NẾU TRÚNG ĐỊCH CÓ ĐÁNH DẤU SÉT: HỦY ĐÁNH DẤU VÀ TẬP TỨC HỒI CHIÊU 1
+                            if (entity.lightningMarkTimer > 0) {
+                                entity.lightningMarkTimer = 0; // Hủy đánh dấu
+                                if (this.owner) {
+                                    this.owner.cooldowns['1'] = 0; // Lập tức hồi chiêu 1
+                                }
+                            }
+
                             if (this.owner && this.owner.premiumErosion) {
                                 entity.grievousWoundsTimer = 3.5;
                                 entity.erosionAttacker = this.owner;
@@ -399,7 +536,7 @@ class Projectile {
                 });
             }
         }
-
+        
         if (this.travelled >= this.range) {
             this.isExpiring = true;
         }
@@ -917,19 +1054,19 @@ function initGame() {
         let localSpawn = getSpawnCoordinates(isHost);
         let remoteSpawn = getSpawnCoordinates(!isHost);
 
-        gameState.player = new RobotR1(localSpawn.x, localSpawn.y);
+        gameState.player = (gameState.selectedHeroKey === 'cheese') ? new Cheese(localSpawn.x, localSpawn.y) : new RobotR1(localSpawn.x, localSpawn.y);
         gameState.player.color = isHost ? "#1e88e5" : "#e53935";
 
-        gameState.remotePlayer = new RobotR1(remoteSpawn.x, remoteSpawn.y);
+        gameState.remotePlayer = new RobotR1(remoteSpawn.x, remoteSpawn.y); // Đối thủ
         gameState.remotePlayer.color = isHost ? "#e53935" : "#1e88e5";
 
         gameState.entities = [gameState.player, gameState.remotePlayer];
     } else {
-        gameState.player = new RobotR1(MAP_WIDTH / 2, MAP_HEIGHT / 2);
-        gameState.player.color = "#37474f";
+        gameState.player = (gameState.selectedHeroKey === 'cheese') ? new Cheese(MAP_WIDTH / 2, MAP_HEIGHT / 2) : new RobotR1(MAP_WIDTH / 2, MAP_HEIGHT / 2);
         gameState.entities = [gameState.player];
         gameState.remotePlayer = null;
     }
+    gameState.butterDomains = [];
 
     initPlayerXpSystem(gameState.player);
     if (gameState.remotePlayer) {
@@ -964,6 +1101,8 @@ function initGame() {
     }
 
     document.getElementById("cardSelectOverlay").style.display = "none";
+
+    gameState.s2Areas = [];
 
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
@@ -1116,7 +1255,7 @@ canvas.addEventListener('mousedown', (e) => {
 
 function castBasicAttack() {
     let p = gameState.player;
-    if (!p || p.attackCooldown > 0) return; 
+    if (!p || p.attackCooldown > 0 || p.stunTimer > 0) return; // Bị choáng không thể đánh
     
     let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
     let dist = Math.hypot(gameState.mouse.worldX - p.x, gameState.mouse.worldY - p.y);
@@ -1124,51 +1263,61 @@ function castBasicAttack() {
     if (dist > 320) return; 
 
     p.angle = angle;
-    p.attackCooldown = p.stats.attackSpeed; 
 
-    if (gameState.mode === 'match' && !isHost) {
-        conn.send({ type: 'client-cast', skill: 'aa', x: p.x, y: p.y, angle: angle });
+    // Kiểm tra X2 tốc đánh khi đứng trong Lãnh Địa Bơ
+    let actualAS = p.stats.attackSpeed;
+    if (p.inButterDomain) {
+        actualAS *= 0.5; // Giảm một nửa thời gian hồi đòn đánh = X2 Tốc đánh
+    }
+    p.attackCooldown = actualAS; 
+
+    if (p instanceof Cheese) {
+        // Tỉ lệ xuất hiện đòn đánh cường hoá
+        let isEmpowered = Math.random() < p.empoweredChance;
+        if (isEmpowered) {
+            p.empoweredChance = 0.05; // Reset về 5%
+            createCheeseEmpoweredAA(p, p.x, p.y, angle);
+        } else {
+            p.empoweredChance += 0.05; // +5% mỗi lần bắn xịt
+            createLocalBasicAttack(p, p.x, p.y, angle);
+        }
     } else {
         createLocalBasicAttack(p, p.x, p.y, angle);
     }
 }
 
+// Đòn đánh thường hạt phô mai nhỏ (100% AD)
 function createLocalBasicAttack(owner, x, y, angle) {
     gameState.projectiles.push(new Projectile({
         owner: owner,
-        x: x,
-        y: y,
-        vx: Math.cos(angle),
-        vy: Math.sin(angle),
-        radius: 6,
-        speed: 8,
+        x: x, y: y,
+        vx: Math.cos(angle), vy: Math.sin(angle),
+        radius: 7, speed: 9,
         type: 'aa',
-        damage: owner ? owner.stats.ad * 0.75 : 10, 
+        damage: owner ? owner.stats.ad * 1.0 : 10, 
         dmgType: 'physical',
-        color: '#ffeb3b',
+        color: '#fff176',
         range: 320
     }));
 }
 
-function castSkill1() {
-    let p = gameState.player;
-    if (!p || p.cooldowns['1'] > 0) return;
-    if (p.stats.mana < p.manaCosts['1']) return;
-
-    let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
-    p.angle = angle;
-
-    p.stats.mana -= p.manaCosts['1'];
-
-    let actualCdr = Math.min(0.50, p.stats.cdr + (p.blueBuffTime > 0 ? 0.20 : 0));
-    p.cooldowns['1'] = p.maxCooldowns['1'] * (1 - actualCdr); 
-
-    if (gameState.mode === 'match' && !isHost) {
-        conn.send({ type: 'client-cast', skill: '1', x: p.x, y: p.y, angle: angle });
-    } else {
-        createLocalSkill1(p, p.x, p.y, angle);
-    }
+// Đòn đánh cường hoá: Khối Bơ lớn (200% AD + Choáng 0.25s + SÁT THƯƠNG CHUẨN)
+function createCheeseEmpoweredAA(owner, x, y, angle) {
+    gameState.projectiles.push(new Projectile({
+        owner: owner,
+        x: x, y: y,
+        vx: Math.cos(angle), vy: Math.sin(angle),
+        radius: 12, speed: 11,
+        type: 'cheese_empowered_aa',
+        damage: owner ? owner.stats.ad * 2.0 : 20,
+        dmgType: 'true', // CHUYỂN THÀNH SÁT THƯƠNG CHUẨN
+        color: '#fbc02d',
+        stunDuration: 0.25,
+        range: 320
+    }));
 }
+
+
 
 function createLocalSkill1(owner, x, y, angle) {
     gameState.projectiles.push(new Projectile({
@@ -1186,41 +1335,118 @@ function createLocalSkill1(owner, x, y, angle) {
     }));
 }
 
+function castSkill1() {
+    let p = gameState.player;
+    if (!p || p.cooldowns['1'] > 0 || p.stunTimer > 0) return;
+    if (p.stats.mana < p.manaCosts['1']) return;
+
+    let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
+    p.angle = angle;
+    p.stats.mana -= p.manaCosts['1'];
+
+    let actualCdr = Math.min(0.50, p.stats.cdr + (p.blueBuffTime > 0 ? 0.20 : 0));
+    p.cooldowns['1'] = p.maxCooldowns['1'] * (1 - actualCdr);
+
+    if (p instanceof Cheese) {
+        // --- CHIÊU 1 CỦA PK CHEESE ---
+        p.dashVector = { x: Math.cos(angle), y: Math.sin(angle) };
+        p.dashDistanceRemaining = 150;
+        p.attackCooldown = 0;
+
+        // Buff Tốc đánh hết tác dụng sau 1s
+        p.s1BonusAS = 0.10 + (p.level * 0.01);
+        p.s1BuffTimer = 1.0; 
+        p.attackSpeedBonus = (p.attackSpeedBonus || 0) + p.s1BonusAS;
+        recalculateAttackSpeed(p);
+    } else {
+        // --- CHIÊU 1 CỦA ROBOT R1 (Bắn Quả Cầu Điện Tích) ---
+        if (gameState.mode === 'match' && !isHost) {
+            conn.send({ type: 'client-cast', skill: '1', x: p.x, y: p.y, angle: angle });
+        } else {
+            createLocalSkill1(p, p.x, p.y, angle);
+        }
+    }
+}
+
 function castSkill2() {
     let p = gameState.player;
-    if (!p || p.cooldowns['2'] > 0) return;
+    if (!p || p.cooldowns['2'] > 0 || p.stunTimer > 0) return;
     if (p.stats.mana < p.manaCosts['2']) return;
 
     p.stats.mana -= p.manaCosts['2'];
-
-    p.shieldActive = true;
-    p.shieldTime = 1.0; 
-
     let actualCdr = Math.min(0.50, p.stats.cdr + (p.blueBuffTime > 0 ? 0.20 : 0));
-    p.cooldowns['2'] = p.maxCooldowns['2'] * (1 - actualCdr); 
+    p.cooldowns['2'] = p.maxCooldowns['2'] * (1 - actualCdr);
 
-    if (gameState.mode === 'match' && !isHost) {
-        conn.send({ type: 'client-cast', skill: '2' });
+    if (p instanceof Cheese) {
+        // Chiêu 2 của PK Cheese giữ nguyên
+        let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
+        p.angle = angle;
+        gameState.projectiles.push(new Projectile({
+            owner: p,
+            x: p.x, y: p.y,
+            vx: Math.cos(angle), vy: Math.sin(angle),
+            radius: 27, speed: 10,
+            type: 'cheese_s2', 
+            damage: p.stats.ad * 0.75, dmgType: 'physical',
+            color: '#fff59d', stunDuration: 0.25,
+            piercing: true, hitEntities: [], range: 650
+        }));
+    } else {
+        // --- CHIÊU 2 CỦA ROBOT R1 ---
+        let maxCastRange = 320 * 1.25; // 400px (Lớn hơn 25% tầm đánh)
+        let mouseX = gameState.mouse.worldX;
+        let mouseY = gameState.mouse.worldY;
+        let dist = Math.hypot(mouseX - p.x, mouseY - p.y);
+
+        let targetX = mouseX;
+        let targetY = mouseY;
+        if (dist > maxCastRange) {
+            let angle = Math.atan2(mouseY - p.y, mouseX - p.x);
+            targetX = p.x + Math.cos(angle) * maxCastRange;
+            targetY = p.y + Math.sin(angle) * maxCastRange;
+        }
+
+        // Tăng gấp đôi giáp và kháng phép ngay lập tức trong 2.5s
+        p.doubleResistTimer = 2.5;
+
+        // Tạo khu vực báo động Chiêu 2 chờ nổ sau 0.5s
+        gameState.s2Areas.push({
+            owner: p,
+            x: targetX,
+            y: targetY,
+            radius: 100,
+            timer: 0.5
+        });
+
+        if (gameState.mode === 'match' && !isHost) {
+            conn.send({ type: 'client-cast', skill: '2', x: targetX, y: targetY });
+        }
     }
 }
 
 function castSkill3() {
     let p = gameState.player;
-    if (!p || p.cooldowns['3'] > 0) return;
+    if (!p || p.cooldowns['3'] > 0 || p.stunTimer > 0) return;
     if (p.stats.mana < p.manaCosts['3']) return;
-
-    let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
-    p.angle = angle;
 
     p.stats.mana -= p.manaCosts['3'];
 
     let actualCdr = Math.min(0.50, p.stats.cdr + (p.blueBuffTime > 0 ? 0.20 : 0));
-    p.cooldowns['3'] = p.maxCooldowns['3'] * (1 - actualCdr); 
+    p.cooldowns['3'] = p.maxCooldowns['3'] * (1 - actualCdr);
 
-    if (gameState.mode === 'match' && !isHost) {
-        conn.send({ type: 'client-cast', skill: '3', x: p.x, y: p.y, angle: angle });
+    if (p instanceof Cheese) {
+        // --- CHIÊU 3 CỦA PK CHEESE (Lãnh Địa Bơ 7s) ---
+        gameState.butterDomains.push(new ButterDomain(p.x, p.y, p));
     } else {
-        createLocalSkill3(p, p.x, p.y, angle);
+        // --- CHIÊU 3 CỦA ROBOT R1 (Hỏa Cầu Khổng Lồ) ---
+        let angle = Math.atan2(gameState.mouse.worldY - p.y, gameState.mouse.worldX - p.x);
+        p.angle = angle;
+
+        if (gameState.mode === 'match' && !isHost) {
+            conn.send({ type: 'client-cast', skill: '3', x: p.x, y: p.y, angle: angle });
+        } else {
+            createLocalSkill3(p, p.x, p.y, angle);
+        }
     }
 }
 
@@ -1362,7 +1588,7 @@ function generateUpgradeChoices() {
     if (!isPremiumMilestone) {
         let statPool = [
             { id: 'muscle', title: 'Cơ bắp', getDesc: (ci) => `+${5 + ci * 3} Công vật lý` },
-            { id: 'magic', title: 'Phép thuật', getDesc: (ci) => `+${10 + ci * 5} Công phép` },
+            { id: 'magic', title: 'Phép thuật', getDesc: (ci) => `+${10 + ci * 6.5} Công phép` },
             { id: 'build', title: 'Thể hình', getDesc: (ci) => `+${25 + ci * 10} HP tối đa` },
             { id: 'shoes', title: 'Giày', getDesc: (ci) => `+${(5 + ci * 1.5).toFixed(1)} Tốc chạy hiển thị` },
             { id: 'rapidfire', title: 'Liên thành', getDesc: (ci) => `+${(7 + ci * 2.5).toFixed(1)}% Tốc đánh` },
@@ -1378,7 +1604,6 @@ function generateUpgradeChoices() {
             { id: 'bomluc', title: 'Bơm lực', getDesc: (ci) => `+${(2.5 + ci * 0.9).toFixed(2)} Hồi Mana/s` },
             { id: 'thosan', title: 'Thợ săn', getDesc: (ci) => `+${(10 + ci * 2.5).toFixed(1)}% EXP quái rừng` },
             { id: 'tichtu', title: 'Tích tụ', getDesc: (ci) => `Tích lũy nhận 250 EXP mỗi khi đủ 250 điểm tích tụ (Tốc độ nạp nhanh hơn)` },
-            // Đã bổ sung 3 thẻ cơ bản mới theo yêu cầu:
             { id: 'kheoleo', title: 'Khéo léo', getDesc: (ci) => `+${(5 + ci * 1.4).toFixed(2)}% Tỉ lệ chí mạng` },
             { id: 'khocluc', title: 'Khốc lực', getDesc: (ci) => `+${(4.25 + ci * 1.33).toFixed(2)}% Sát thương chí mạng` },
             { id: 'chiluc', title: 'Chí lực', getDesc: (ci) => `+${(3 + ci * 0.65).toFixed(2)}% Tỉ lệ chí mạng & +${(2.31 + ci * 0.6).toFixed(2)}% Sát thương chí mạng` }
@@ -1497,7 +1722,6 @@ function applyUpgrade(upgrade) {
             p.stats.cdr += 0.05; 
         } else if (upgrade.id === 'tuchua') {
             let addedRegen = 2 + chainIndex * 0.75;
-            // Áp dụng cơ chế chuyển hồi phục sang hút máu khi có Quỷ quyết / Thánh quyết
             if (p.premiumQuydet || p.premiumThanhquet) {
                 if (p.premiumQuydet) {
                     p.stats.lifesteal += addedRegen * 1.1;
@@ -1519,7 +1743,6 @@ function applyUpgrade(upgrade) {
                 interval: Math.max(0.1, 1.0 - chainIndex * 0.15) 
             });
         }
-        // Áp dụng chỉ số từ 3 thẻ cơ bản mới
         else if (upgrade.id === 'kheoleo') {
             p.stats.critRate += 5 + chainIndex * 1.4;
         } else if (upgrade.id === 'khocluc') {
@@ -1534,18 +1757,18 @@ function applyUpgrade(upgrade) {
         if (upgrade.id === 'guardian') {
             p.premiumGuardian = true;
         } else if (upgrade.id === 'eye') {
-            p.premiumEye = true; // Sẽ tự nhân 110% tốc chạy tại getSpeed()
+            p.premiumEye = true;
         } else if (upgrade.id === 'gunner') {
             p.premiumGunner = true;
             let penalty = p.stats.speed * 0.75;
-            p.stats.speed -= penalty; // Giảm 75% tốc chạy hiện có vĩnh viễn (các nâng cấp sau này sẽ cộng thêm bình thường)
+            p.stats.speed -= penalty; 
             
-            p.attackSpeedBonus = (p.attackSpeedBonus || 0) + 1.0; // +100% tốc đánh
+            p.attackSpeedBonus = (p.attackSpeedBonus || 0) + 1.0; 
             recalculateAttackSpeed(p);
             
-            p.stats.ad *= 1.50; // +50% công vật lý
-            p.stats.critRate += 25; // +25% tỉ lệ chí mạng
-            p.stats.critDamage += 25; // +25% sát thương chí mạng
+            p.stats.ad *= 1.50; 
+            p.stats.critRate += 25; 
+            p.stats.critDamage += 25; 
         }
         else if (upgrade.id === 'quydet') {
             let preRegen = p.stats.hpRegen;
@@ -1673,8 +1896,39 @@ function update(dt) {
                 if (entity !== proj.owner) {
                     let dist = Math.hypot(entity.x - proj.x, entity.y - proj.y);
                     if (dist <= entity.radius + proj.radius) {
+
+                        // Xử lý đạn Chiêu 2 xuyên mục tiêu (Fix crash bằng khởi tạo hitEntities an toàn)
+                        if (proj.type === 'cheese_s2') {
+                            if (!proj.hitEntities) proj.hitEntities = [];
+                            if (!proj.hitEntities.includes(entity)) {
+                                proj.hitEntities.push(entity);
+                                let actualDmg = entity.takeDamage(proj.damage, proj.dmgType, proj.owner, false);
+                                entity.stunTimer = proj.stunDuration || 0.25; 
+                            }
+                            continue; 
+                        }
+
+                        // Xử lý Đòn đánh Cường hoá của Cheese (Cho phép Chí mạng)
+                        if (proj.type === 'cheese_empowered_aa') {
+                            let finalDmg = proj.damage;
+                            let isCrit = false;
+                            if (proj.owner) {
+                                let roll = Math.random() * 100;
+                                if (roll < proj.owner.stats.critRate) {
+                                    isCrit = true;
+                                    let critBonus = proj.owner.stats.critDamage;
+                                    let minCrit = finalDmg * 2;
+                                    let maxCrit = finalDmg * 2 + finalDmg * (critBonus / 100) + critBonus;
+                                    finalDmg = minCrit + Math.random() * (maxCrit - minCrit);
+                                }
+                            }
+                            entity.takeDamage(finalDmg, proj.dmgType, proj.owner, isCrit);
+                            entity.stunTimer = proj.stunDuration || 0.25; 
+                            hit = true;
+                            break;
+                        }
+
                         if (proj.type !== '1') {
-                            
                             let finalDmg = proj.damage;
                             let isCrit = false;
                             if (proj.type === 'aa' && proj.owner) {
@@ -1710,7 +1964,6 @@ function update(dt) {
                                 }
                             }
 
-                            // Guardian: đòn đánh thường trúng đích hồi 0.5% HP tối đa
                             if (proj.type === 'aa' && proj.owner && proj.owner.premiumGuardian) {
                                 proj.owner.heal(proj.owner.stats.maxHp * 0.005);
                             }
@@ -1721,6 +1974,14 @@ function update(dt) {
 
                             if (proj.type === '3') {
                                 createExplosion(entity, finalAngle);
+
+                                // BỔ SUNG: Choáng 0.5s (Áp dụng lên cả Quái và Tướng)
+                                entity.stunTimer = Math.max(entity.stunTimer, 0.5);
+
+                                // BỔ SUNG: Đánh dấu sét 5s (KHÔNG áp dụng lên quái)
+                                if (!(entity instanceof Monster)) {
+                                    entity.lightningMarkTimer = 5.0;
+                                }
                             }
                             break;
                         }
@@ -1741,7 +2002,6 @@ function update(dt) {
                     if (killer) {
                         killer.heal(killer.stats.maxHp * 0.05);
                         
-                        // Guardian: Diệt quái nhận +3 HP tối đa vĩnh viễn
                         if (killer.premiumGuardian) {
                             killer.stats.maxHp += 3;
                             killer.stats.hp += 3;
@@ -1838,9 +2098,21 @@ function update(dt) {
 
     for (let i = gameState.explosions.length - 1; i >= 0; i--) {
         let exp = gameState.explosions[i];
-        exp.frameTimer += 1; 
-        if (exp.frameTimer > 6) {
-            gameState.explosions.splice(i, 1);
+        if (exp.type === 's2_ex') {
+            exp.frameTimer += dt;
+            // Mỗi frame chạy trong 0.08s (tổng 3 frame ~ 0.24s)
+            if (exp.frameTimer >= 0.08) {
+                exp.frameTimer = 0;
+                exp.frame++;
+                if (exp.frame >= exp.maxFrames) {
+                    gameState.explosions.splice(i, 1);
+                }
+            }
+        } else {
+            exp.frameTimer += 1; 
+            if (exp.frameTimer > 6) {
+                gameState.explosions.splice(i, 1);
+            }
         }
     }
 
@@ -1850,6 +2122,49 @@ function update(dt) {
         text.life -= dt;
         if (text.life <= 0) {
             gameState.damageTexts.splice(i, 1);
+        }
+    }
+
+    // BỔ SUNG VÀO HÀM update(dt) TRONG main.js:
+    // --- XỬ LÝ ĐẾM NGƯỢC TỰ NỔ CHIÊU 2 CỦA ROBOT R1 (0.5s) ---
+    for (let i = gameState.s2Areas.length - 1; i >= 0; i--) {
+        let area = gameState.s2Areas[i];
+        area.timer -= dt;
+
+        if (area.timer <= 0) {
+            // 1. Gây sát thương & hiệu ứng khi phát nổ
+            gameState.entities.forEach(entity => {
+                if (entity !== area.owner) {
+                    let dist = Math.hypot(entity.x - area.x, entity.y - area.y);
+                    if (dist <= entity.radius + area.radius) {
+                        let magicDmg = area.owner ? (area.owner.stats.ap * 0.10) : 10;
+                        entity.takeDamage(magicDmg, 'magic', area.owner, false);
+
+                        // Choáng 1s
+                        entity.stunTimer = Math.max(entity.stunTimer, 1.0);
+
+                        // Đánh dấu sét 5s (không áp dụng lên quái)
+                        if (!(entity instanceof Monster)) {
+                            entity.lightningMarkTimer = 5.0;
+                        }
+                    }
+                }
+            });
+
+            // 2. Tạo hiệu ứng nổ 3 frame từ ex.png (Kích thước 250px - to hơn vùng sát thương 50px)
+            gameState.explosions.push({
+                type: 's2_ex',
+                x: area.x,
+                y: area.y,
+                radius: area.radius,
+                drawSize: (area.radius * 2) + 50, // 100 * 2 + 50 = 250px
+                frame: 0,
+                frameTimer: 0,
+                maxFrames: 3
+            });
+
+            // 3. Xóa vùng cảnh báo
+            gameState.s2Areas.splice(i, 1);
         }
     }
 
@@ -2168,14 +2483,14 @@ function updateBuffHUD(p) {
 
     if (p.blueBuffTime > 0) {
         container.innerHTML += `
-            <div class="buff-icon blue" style="background-image: url('blue.png');">
+            <div class="buff-icon blue" style="background-image: url('assets/icon/blue.png');">
                 <span class="buff-timer">${Math.ceil(p.blueBuffTime)}s</span>
             </div>
         `;
     }
     if (p.redBuffTime > 0) {
         container.innerHTML += `
-            <div class="buff-icon red" style="background-image: url('red.png');">
+            <div class="buff-icon red" style="background-image: url('assets/icon/red.png');">
                 <span class="buff-timer">${Math.ceil(p.redBuffTime)}s</span>
             </div>
         `;
@@ -2215,6 +2530,22 @@ function draw() {
             }
         }
     });
+
+    // VẼ VÙNG BÁO ĐỘNG CHIÊU 2 CHỜ NỔ
+    gameState.s2Areas.forEach(area => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 235, 59, 0.2)";
+        ctx.fill();
+        ctx.strokeStyle = "#ffeb3b";
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([8, 4]);
+        ctx.stroke();
+        ctx.restore();
+    });
+
+    gameState.butterDomains.forEach(domain => domain.draw());
 
     drawExplosions();
     drawDamageTexts();
@@ -2292,41 +2623,101 @@ function drawSkillAimIndicator() {
     ctx.save();
     ctx.translate(p.x, p.y);
 
-    if (gameState.activeSkillAiming === '1') {
+    if (p instanceof Cheese) {
         ctx.rotate(angle);
-        ctx.fillStyle = "rgba(0, 229, 255, 0.05)";
-        ctx.fillRect(0, -120, 500, 240); 
-        ctx.strokeStyle = "rgba(0, 229, 255, 0.3)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 6]);
-        ctx.strokeRect(0, -120, 500, 240);
-        ctx.setLineDash([]);
+        if (gameState.activeSkillAiming === '1') {
+            // Chiêu 1: Mũi tên chỉ hướng lướt 150px
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(150, 0);
+            ctx.strokeStyle = "#ffee58";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+        } 
+        else if (gameState.activeSkillAiming === '2') {
+            // Chiêu 2: Dải định hướng bắn xuyên 650px
+            ctx.fillStyle = "rgba(255, 235, 59, 0.15)";
+            ctx.fillRect(0, -18, 650, 36);
+            ctx.strokeStyle = "#fbc02d";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(0, -18, 650, 36);
+        } 
+        else if (gameState.activeSkillAiming === '3') {
+            // Chiêu 3: Vòng tròn phạm vi Lãnh địa Bơ 320px
+            ctx.beginPath();
+            ctx.arc(0, 0, 320, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 193, 7, 0.2)";
+            ctx.fill();
+            ctx.strokeStyle = "#ffa000";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    } else {
+        if (gameState.activeSkillAiming === '1') {
+            ctx.rotate(angle);
+            ctx.fillStyle = "rgba(0, 229, 255, 0.05)";
+            ctx.fillRect(0, -120, 500, 240); 
+            ctx.strokeStyle = "rgba(0, 229, 255, 0.3)";
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([6, 6]);
+            ctx.strokeRect(0, -120, 500, 240);
+            ctx.setLineDash([]);
+    
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(500, 0);
+            ctx.strokeStyle = "rgba(0, 229, 255, 0.6)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        } 
+        else if (gameState.activeSkillAiming === '2') {
+            let maxCastRange = 320 * 1.25; // 400px
 
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(500, 0);
-        ctx.strokeStyle = "rgba(0, 229, 255, 0.6)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    } 
-    else if (gameState.activeSkillAiming === '2') {
-        ctx.beginPath();
-        ctx.arc(0, 0, 75, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(76, 175, 80, 0.15)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(76, 175, 80, 0.5)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    } 
-    else if (gameState.activeSkillAiming === '3') {
-        ctx.rotate(angle);
-        ctx.fillStyle = "rgba(244, 67, 54, 0.15)";
-        ctx.fillRect(0, -35, 1200, 70); 
-        ctx.strokeStyle = "rgba(244, 67, 54, 0.5)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(0, -35, 1200, 70);
+            // 1. Vẽ vòng tròn tầm thi triển (Range circle)
+            ctx.beginPath();
+            ctx.arc(0, 0, maxCastRange, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0, 229, 255, 0.05)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0, 229, 255, 0.4)";
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([6, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Tính vị trí vòng chỉ định nổ 100px
+            let mouseX = gameState.mouse.worldX;
+            let mouseY = gameState.mouse.worldY;
+            let dist = Math.hypot(mouseX - p.x, mouseY - p.y);
+            let targetX = mouseX;
+            let targetY = mouseY;
+
+            if (dist > maxCastRange) {
+                let a = Math.atan2(mouseY - p.y, mouseX - p.x);
+                targetX = p.x + Math.cos(a) * maxCastRange;
+                targetY = p.y + Math.sin(a) * maxCastRange;
+            }
+        
+            let relX = targetX - p.x;
+            let relY = targetY - p.y;
+        
+            // 3. Vẽ vòng tròn phạm vi ảnh hưởng 100px tại vị trí chỉ định
+            ctx.beginPath();
+            ctx.arc(relX, relY, 100, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 87, 34, 0.25)";
+            ctx.fill();
+            ctx.strokeStyle = "#ff5722";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        else if (gameState.activeSkillAiming === '3') {
+            ctx.rotate(angle);
+            ctx.fillStyle = "rgba(244, 67, 54, 0.15)";
+            ctx.fillRect(0, -35, 1200, 70); 
+            ctx.strokeStyle = "rgba(244, 67, 54, 0.5)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, -35, 1200, 70);
+        }
     }
-
     ctx.restore();
 }
 
@@ -2334,41 +2725,96 @@ function drawExplosions() {
     gameState.explosions.forEach(exp => {
         ctx.save();
         ctx.translate(exp.x, exp.y);
-        ctx.rotate(exp.angle);
 
-        let explosionSize = exp.targetRadius * 2 * 2.5;
-        let currentExplosionImg = (exp.frameTimer <= 3) ? imgAssets.firehit1 : imgAssets.firehit;
+        if (exp.type === 's2_ex') {
+            // --- VẼ HIỆU ỨNG NỔ CHIÊU 2 TỪ EX.PNG (1024x3072) ---
+            const frameHeight = 1024;
+            const frameWidth = 1024;
+            const drawSize = exp.drawSize || 250; // Kích thước to hơn bán kính 50px
 
-        if (currentExplosionImg.complete && currentExplosionImg.naturalWidth > 0) {
-            ctx.drawImage(
-                currentExplosionImg,
-                -explosionSize / 2,
-                -explosionSize / 2,
-                explosionSize,
-                explosionSize
-            );
+            if (imgAssets.ex.complete && imgAssets.ex.naturalWidth > 0) {
+                ctx.drawImage(
+                    imgAssets.ex,
+                    0, exp.frame * frameHeight, frameWidth, frameHeight, // Cắt theo chiều dọc (0, 1024, 2048)
+                    -drawSize / 2, -drawSize / 2, drawSize, drawSize     // Vẽ căn giữa
+                );
+            } else {
+                // Đồ họa dự phòng nếu chưa tải kịp ảnh
+                ctx.beginPath();
+                ctx.arc(0, 0, exp.radius + 25, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 235, 59, 0.6)";
+                ctx.fill();
+            }
         } else {
-            let currentScale = (exp.frameTimer <= 3) ? 1.0 : 1.3;
-            let radialGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, (explosionSize / 2) * currentScale);
-            radialGlow.addColorStop(0, exp.frameTimer <= 3 ? "rgba(255, 235, 59, 0.9)" : "rgba(255, 87, 34, 0.7)");
-            radialGlow.addColorStop(0.5, "rgba(230, 81, 0, 0.5)");
-            radialGlow.addColorStop(1, "rgba(0,0,0,0)");
+            // --- CÁC HIỆU ỨNG NỔ CŨ ---
+            ctx.rotate(exp.angle);
+            let explosionSize = exp.targetRadius * 2 * 2.5;
+            let currentExplosionImg = (exp.frameTimer <= 3) ? imgAssets.firehit1 : imgAssets.firehit;
 
-            ctx.beginPath();
-            ctx.arc(0, 0, (explosionSize / 2) * currentScale, 0, Math.PI * 2);
-            ctx.fillStyle = radialGlow;
-            ctx.fill();
+            if (currentExplosionImg.complete && currentExplosionImg.naturalWidth > 0) {
+                ctx.drawImage(
+                    currentExplosionImg,
+                    -explosionSize / 2,
+                    -explosionSize / 2,
+                    explosionSize,
+                    explosionSize
+                );
+            }
         }
 
         ctx.restore();
     });
 }
 
+function drawTintedIcon(ctx, img, x, y, size, color) {
+    if (!img.complete || img.naturalWidth === 0) return;
+    
+    let offCanvas = document.createElement('canvas');
+    offCanvas.width = size;
+    offCanvas.height = size;
+    let offCtx = offCanvas.getContext('2d');
+    
+    offCtx.drawImage(img, 0, 0, size, size);
+    offCtx.globalCompositeOperation = 'source-in';
+    offCtx.fillStyle = color;
+    offCtx.fillRect(0, 0, size, size);
+    
+    ctx.drawImage(offCanvas, x, y);
+}
+
 function drawDamageTexts() {
     gameState.damageTexts.forEach(text => {
-        ctx.font = "bold 20px Arial";
-        ctx.fillStyle = text.color;
-        ctx.fillText(text.text, text.x, text.y);
+        ctx.save();
+        ctx.globalAlpha = Math.min(1.0, text.life * 1.5);
+
+        if (text.isCrit) {
+            let fontSize = 40; 
+            ctx.font = `italic bold ${fontSize}px Arial`;
+            ctx.fillStyle = text.color;
+            ctx.textAlign = "left";
+
+            let textWidth = ctx.measureText(text.text).width;
+            let iconSize = fontSize * 0.85; 
+            let spacing = 4;
+            let totalWidth = textWidth + spacing + iconSize;
+
+            let startX = text.x - totalWidth / 2;
+            let startY = text.y;
+
+            ctx.fillText(text.text, startX, startY);
+
+            let iconX = startX + textWidth + spacing;
+            let iconY = startY - fontSize * 0.75;
+            drawTintedIcon(ctx, imgAssets.critIcon, iconX, iconY, iconSize, text.color);
+
+        } else {
+            ctx.font = "bold 20px Arial";
+            ctx.fillStyle = text.color;
+            ctx.textAlign = "center";
+            ctx.fillText(text.text, text.x, text.y);
+        }
+
+        ctx.restore();
     });
 }
 
@@ -2431,7 +2877,7 @@ function drawMinimap() {
         if (entity === gameState.player) {
             showOnMinimap = true;
         } else if (entity === gameState.remotePlayer) {
-            showOnMinimap = visible; // Con mắt thủy triều chỉ hiển thị mũi tên chỉ hướng, đối thủ ở vùng tối không hiện trên minimap
+            showOnMinimap = visible;
         } else if (entity instanceof Monster) {
             showOnMinimap = true; 
         } else if (entity.isDummy) {

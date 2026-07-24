@@ -450,7 +450,6 @@
         </div>
     </div>
 
-    <!-- Bảng chọn tướng -->
     <div id="heroSelectScreen" style="display: none;">
         <h2>Chọn Tướng Lĩnh</h2>
         <div class="hero-list">
@@ -458,6 +457,14 @@
                 <h3>Robot R1</h3>
                 <p style="font-size: 12px; color: #aaa; margin-top: 10px;">
                     Chiến binh cơ khí tầm xa. Sử dụng quả cầu điện tích và hỏa cầu khổng lồ.
+                </p>
+            </div>
+
+            <!-- THÊM TƯỚNG PK CHEESE VÀO ĐÂY -->
+            <div class="hero-card" id="card_cheese" onclick="selectHero('cheese')">
+                <h3>PK cheese</h3>
+                <p style="font-size: 12px; color: #ffeb3b; margin-top: 10px;">
+                    Sạ thủ Phô Mai cơ động cao. Đòn đánh tích tụ gây choáng, Lãnh Địa Bơ gấp đôi tốc đánh!
                 </p>
             </div>
         </div>
@@ -585,7 +592,7 @@
                 </div>
                 <div class="skill-slot" id="slot_2">
                     <span>Chiêu 2 (2)</span>
-                    <span style="color:#4caf50; font-size: 9px;">Lá chắn</span>
+                    <span style="color:#4caf50; font-size: 9px;">Bão Điện</span>
                     <div class="skill-cooldown" id="cd_2"></div>
                 </div>
                 <div class="skill-slot" id="slot_3">
@@ -612,17 +619,23 @@
         firecore: new Image(),
         firehit1: new Image(),
         firehit: new Image(),
+        ex: new Image(), // <<< BỔ SUNG ẢNH NỔ CHIÊU 2
         e: [new Image(), new Image(), new Image(), new Image(), new Image()],
         blueIcon: new Image(),
-        redIcon: new Image()
+        redIcon: new Image(),
+        critIcon: new Image()
     };
+
+    imgAssets.ex.src = "assets/skill_effect/robotR1/ex.png"; // <<< BỔ SUNG ĐƯỜNG DẪN ẢNH EX.PNG
 
     imgAssets.core.src = "assets/skill_effect/robotR1/core.png";
     imgAssets.firecore.src = "assets/skill_effect/robotR1/firecore.png";
     imgAssets.firehit1.src = "assets/skill_effect/robotR1/firehit1.png";
     imgAssets.firehit.src = "assets/skill_effect/robotR1/firehit2.png";
-    imgAssets.blueIcon.src = "blue.png";
-    imgAssets.redIcon.src = "red.png";
+    imgAssets.blueIcon.src = "assets/icon/blue.png";
+    imgAssets.redIcon.src = "assets/icon/red.png";
+    imgAssets.critIcon.src = "assets/icon/crit.png"; // Nạp ảnh icon chí mạng
+
     for (let i = 0; i < 5; i++) {
         imgAssets.e[i].src = `assets/skill_effect/robotR1/e${i+1}.png`;
     }
@@ -645,6 +658,7 @@
         selectedHeroKey: 'robotR1', 
         entities: [],
         projectiles: [],
+        s2Areas: [], // THÊM VÙNG CHIÊU 2 CHỜ NỔ
         explosions: [], 
         damageTexts: [],
         camera: { x: 0, y: 0 },
@@ -655,7 +669,8 @@
         respawnTimers: [],
         gameStartTime: 0,
         localLives: 5,
-        remoteLives: 5
+        remoteLives: 5,
+        butterDomains: [],
     };
 
     let peer = null;
@@ -668,6 +683,7 @@
 </script>
 <script src="main.js"></script>
 <script src="hero/robotR1.js"></script>
+<script src="hero/cheese.js"></script> <!-- NẠP THÊM FILE NÀY -->
 <script src="mon.js"></script>
 
 </body>

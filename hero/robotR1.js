@@ -1,13 +1,18 @@
-// Khởi tạo đối tượng lưu trữ các bộ ảnh hoạt ảnh di chuyển
+// Khởi tạo đối tượng lưu trữ các bộ ảnh hoạt ảnh di chuyển và trạng thái nghỉ (idle)
 const ROBOT_ANIMS = {
     left: [],
     right: [],
     up: [],
-    down: []
+    down: [],
+    idleLeft: [],
+    idleRight: [],
+    idleUp: [],
+    idleDown: []
 };
 
-// Tiền tải (Preload) toàn bộ 4 hướng hoạt ảnh để tránh hiện tượng nhấp nháy khi chơi
+// Tiền tải (Preload) toàn bộ 4 hướng hoạt ảnh di chuyển và nghỉ để tránh hiện tượng nhấp nháy
 for (let i = 0; i < 4; i++) {
+    // Hoạt ảnh di chuyển
     const imgLeft = new Image();
     imgLeft.src = `assets/animation/robotR1_control/robotR1_trai${i}.png`;
     ROBOT_ANIMS.left.push(imgLeft);
@@ -23,6 +28,23 @@ for (let i = 0; i < 4; i++) {
     const imgDown = new Image();
     imgDown.src = `assets/animation/robotR1_control/down${i}.png`;
     ROBOT_ANIMS.down.push(imgDown);
+
+    // Hoạt ảnh trạng thái nghỉ (idle/đứng yên)
+    const imgIdleLeft = new Image();
+    imgIdleLeft.src = `assets/animation/robotR1_control/nghi_trai${i}.png`;
+    ROBOT_ANIMS.idleLeft.push(imgIdleLeft);
+
+    const imgIdleRight = new Image();
+    imgIdleRight.src = `assets/animation/robotR1_control/nghi_phai${i}.png`;
+    ROBOT_ANIMS.idleRight.push(imgIdleRight);
+
+    const imgIdleUp = new Image();
+    imgIdleUp.src = `assets/animation/robotR1_control/nghi_up${i}.png`;
+    ROBOT_ANIMS.idleUp.push(imgIdleUp);
+
+    const imgIdleDown = new Image();
+    imgIdleDown.src = `assets/animation/robotR1_control/nghi_down${i}.png`;
+    ROBOT_ANIMS.idleDown.push(imgIdleDown);
 }
 
 class RobotR1 extends Entity {
@@ -33,6 +55,7 @@ class RobotR1 extends Entity {
         
         this.animTime = 0;          // Bộ đếm thời gian hoạt ảnh
         this.currentDir = 'down';   // Hướng hoạt ảnh hiện tại (mặc định ban đầu)
+        this.isMoving = false;      // Trạng thái di chuyển/đứng yên
         this.fps = 6;               // Tốc độ chạy khung hình (6 FPS)
     }
 
@@ -42,25 +65,50 @@ class RobotR1 extends Entity {
         // Luôn cộng dồn thời gian hoạt ảnh để giữ chuyển động tuần hoàn
         this.animTime += dt;
 
-        // Xác định hướng hoạt ảnh dựa trên trạng thái phím nhấn trong gameState
-        const keys = gameState.keys;
-        if (keys) {
-            const isLeft = keys['a'] || keys['arrowleft'] || keys['ArrowLeft'];
-            const isRight = keys['d'] || keys['arrowright'] || keys['ArrowRight'];
-            const isUp = keys['w'] || keys['arrowup'] || keys['ArrowUp'];
-            const isDown = keys['s'] || keys['arrowdown'] || keys['ArrowDown'];
+        // Phân biệt xử lý giữa người chơi local (bản thân) và remote (đối thủ)
+        if (gameState.mode === 'match' && this === gameState.remotePlayer) {
+            // Đối với đối thủ: Tính toán vector hướng di chuyển từ sự thay đổi vị trí (x, y) hướng tới (targetX, targetY)
+            let dx = this.targetX - this.x;
+            let dy = this.targetY - this.y;
+            let dist = Math.hypot(dx, dy);
 
-            // Ưu tiên hướng di chuyển ngang khi nhấn tổ hợp phím (như a+w, a+s, d+w, d+s)
-            if (isLeft) {
-                this.currentDir = 'left';
-            } else if (isRight) {
-                this.currentDir = 'right';
-            } else if (isUp) {
-                this.currentDir = 'up';
-            } else if (isDown) {
-                this.currentDir = 'down';
+            // Nếu khoảng cách sai số đủ lớn, xác định đối thủ đang di chuyển
+            if (dist > 1.5) {
+                this.isMoving = true;
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    this.currentDir = dx < 0 ? 'left' : 'right';
+                } else {
+                    this.currentDir = dy < 0 ? 'up' : 'down';
+                }
+            } else {
+                this.isMoving = false;
             }
-            // Nếu đứng im (không nhấn phím nào), hướng hiện tại và hoạt ảnh vẫn tiếp tục được giữ nguyên
+        } else {
+            // Đối với người chơi hiện tại: Xác định trạng thái di chuyển dựa trên bàn phím điều khiển
+            const keys = gameState.keys;
+            let movingThisFrame = false;
+
+            if (keys) {
+                const isLeft = keys['a'] || keys['arrowleft'] || keys['ArrowLeft'];
+                const isRight = keys['d'] || keys['arrowright'] || keys['ArrowRight'];
+                const isUp = keys['w'] || keys['arrowup'] || keys['ArrowUp'];
+                const isDown = keys['s'] || keys['arrowdown'] || keys['ArrowDown'];
+
+                if (isLeft || isRight || isUp || isDown) {
+                    movingThisFrame = true;
+                    // Ưu tiên hướng di chuyển ngang khi nhấn tổ hợp phím chéo
+                    if (isLeft) {
+                        this.currentDir = 'left';
+                    } else if (isRight) {
+                        this.currentDir = 'right';
+                    } else if (isUp) {
+                        this.currentDir = 'up';
+                    } else if (isDown) {
+                        this.currentDir = 'down';
+                    }
+                }
+            }
+            this.isMoving = movingThisFrame;
         }
     }
 
@@ -71,7 +119,7 @@ class RobotR1 extends Entity {
         ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fill();
 
-        // 2. Vẽ vòng tròn bảo vệ nếu có Lá chắn kích hoạt (được vẽ đè lên bóng nhưng dưới nhân vật)
+        // 2. Vẽ vòng tròn bảo vệ nếu có Lá chắn kích hoạt
         if (this.shieldActive) {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius + 12, 0, Math.PI * 2);
@@ -83,8 +131,17 @@ class RobotR1 extends Entity {
         // 3. Tính toán số thứ tự khung hình hiện tại (từ 0 đến 3) dựa trên thời gian và FPS
         const frameIndex = Math.floor(this.animTime * this.fps) % 4;
 
-        // Lấy danh sách ảnh và khung hình tương ứng theo hướng
-        const animFrames = ROBOT_ANIMS[this.currentDir];
+        // 4. Lựa chọn bộ ảnh hoạt ảnh phù hợp theo trạng thái (di chuyển hoặc nghỉ)
+        let animFrames = null;
+        if (this.isMoving) {
+            animFrames = ROBOT_ANIMS[this.currentDir];
+        } else {
+            if (this.currentDir === 'left') animFrames = ROBOT_ANIMS.idleLeft;
+            else if (this.currentDir === 'right') animFrames = ROBOT_ANIMS.idleRight;
+            else if (this.currentDir === 'up') animFrames = ROBOT_ANIMS.idleUp;
+            else if (this.currentDir === 'down') animFrames = ROBOT_ANIMS.idleDown;
+        }
+
         const currentImg = animFrames ? animFrames[frameIndex] : null;
 
         // Đường kính vẽ hiển thị tính toán là 60px (bán kính hiển thị là 30px)
@@ -92,7 +149,7 @@ class RobotR1 extends Entity {
 
         if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
             ctx.save();
-            // Căn giữa hình ảnh 32x32 (sau khi phóng to thành 60x60) tại tâm tọa độ vật lý của tướng
+            // Căn giữa hình ảnh tại tâm tọa độ vật lý của tướng
             ctx.drawImage(
                 currentImg,
                 this.x - drawSize / 2,
@@ -102,7 +159,7 @@ class RobotR1 extends Entity {
             );
             ctx.restore();
         } else {
-            // Thiết lập vẽ dự phòng (fallback) bằng đồ họa vector khi ảnh chưa kịp tải xong
+            // Vẽ dự phòng (fallback) bằng đồ họa vector khi ảnh chưa kịp tải xong
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
