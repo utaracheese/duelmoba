@@ -52,7 +52,7 @@ class RobotR1 extends Entity {
         const config = HERO_PRESETS['robotR1'];
         // Kế thừa các thông số gốc từ Entity
         super(x, y, config.radius, config.color, false, config.stats);
-        
+        this.rangeType = config.rangeType || 'Xa';
         this.animTime = 0;          // Bộ đếm thời gian hoạt ảnh
         this.currentDir = 'down';   // Hướng hoạt ảnh hiện tại (mặc định ban đầu)
         this.isMoving = false;      // Trạng thái di chuyển/đứng yên

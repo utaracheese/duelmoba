@@ -3,6 +3,7 @@ const HERO_PRESETS = {
         name: "Robot R1",
         radius: 22,
         color: "#37474f",
+        rangeType: "Xa",
         stats: {
             maxHp: 650,
             hpRegen: 2.5,
@@ -136,6 +137,11 @@ class Entity {
 
         this.lightningMarkTimer = 0; // Đếm ngược 5s đánh dấu sét
         this.doubleResistTimer = 0;   // Đếm ngược 2.5s nhận x2 Giáp và Kháng phép
+
+        this.gold = 500; // Vàng khởi điểm
+        this.inventory = []; // Chứa tối đa 6 item ID
+        this.itemCooldowns = {}; // Bộ đếm hồi chiêu nội tại đồ
+        this.rangeType = statsConfig.rangeType || 'Xa';
     }
 
     takeDamage(amount, type, attacker = null, isCrit = false) {
@@ -236,6 +242,10 @@ class Entity {
             }
         }
 
+        if (this.gold !== undefined) {
+            this.gold += 2 * dt;
+        }
+
         if (this.shieldActive) {
             this.shieldTime -= dt;
             if (this.shieldTime <= 0) {
@@ -252,7 +262,13 @@ class Entity {
         if (this.attackCooldown > 0) {
             this.attackCooldown = Math.max(0, this.attackCooldown - dt);
         }
-
+        if (this.itemCooldowns) {
+            for (let key in this.itemCooldowns) {
+                if (this.itemCooldowns[key] > 0) {
+                    this.itemCooldowns[key] = Math.max(0, this.itemCooldowns[key] - dt);
+                }
+            }
+        }
         if (this.blueBuffTime > 0) this.blueBuffTime = Math.max(0, this.blueBuffTime - dt);
         if (this.redBuffTime > 0) this.redBuffTime = Math.max(0, this.redBuffTime - dt);
 
@@ -453,6 +469,7 @@ class Projectile {
         this.originalRadius = config.radius; 
         this.speed = config.speed;
         this.type = config.type; 
+        this.isBonusBullet = config.isBonusBullet || false;
         this.damage = config.damage;
         this.dmgType = config.dmgType || 'physical';
         this.color = config.color || '#fff';
@@ -1943,6 +1960,8 @@ function update(dt) {
                             }
 
                             let actualDmgDealt = entity.takeDamage(finalDmg, proj.dmgType, proj.owner, isCrit);
+                            processItemOnHitPassives(proj.owner, entity, proj);
+
                             hit = true;
 
                             if (proj.owner && proj.owner.premiumErosion) {
@@ -2000,6 +2019,25 @@ function update(dt) {
                 if (entity instanceof Monster) {
                     let killer = (gameState.player && Math.hypot(gameState.player.x - entity.x, gameState.player.y - entity.y) < 600) ? gameState.player : gameState.remotePlayer;
                     if (killer) {
+                        let goldReward = 0;
+                        if (entity.monsterType === 'blue' || entity.monsterType === 'red') goldReward = 64;
+                        else if (entity.monsterType === 'monkey') goldReward = 30;
+                        else if (entity.monsterType === 'golem') goldReward = 50;
+                        else if (entity.monsterType === 'mini_golem') goldReward = 2;
+
+                        if (goldReward > 0) {
+                            killer.gold = (killer.gold || 0) + goldReward;
+                        
+                            // HIỂN THỊ CHỮ VÀNG VÀNG-CAM +(Số vàng) TẠI VỊ TRÍ QUÁI CHẾT
+                            gameState.damageTexts.push({
+                                x: entity.x + (Math.random() - 0.5) * 20,
+                                y: entity.y - entity.radius - 15,
+                                text: `+${goldReward}💰`,
+                                color: "#ff9800", // Màu vàng cam
+                                isCrit: false,
+                                life: 1.2
+                            });
+                        }
                         killer.heal(killer.stats.maxHp * 0.05);
                         
                         if (killer.premiumGuardian) {
@@ -2243,6 +2281,7 @@ function sendHostWorldSync() {
         speed: p.speed,
         radius: p.radius,
         type: p.type,
+        isBonusBullet: p.isBonusBullet,
         color: p.color,
         opacity: p.opacity,
         isExpiring: p.isExpiring,
@@ -2465,6 +2504,10 @@ function updateHUD() {
         ${debuffGrievousText}
     `;
     document.getElementById("statList").innerHTML = statsHTML;
+    if (p.gold !== undefined) {
+        document.getElementById("playerGoldText").innerText = Math.floor(p.gold);
+    }
+    updateHUDInventory();
 }
 
 function updateCooldownUI(skillKey, val) {
@@ -2913,4 +2956,412 @@ function drawMinimap() {
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 1.2;
     ctx.strokeRect(camX, camY, camW, camH);
+}
+
+let currentShopTab = 'ad';
+let selectedShopItemId = null;
+let selectedInventoryIndex = null; // Quản lý ô đồ đang chọn trong túi để bán
+
+// --- HÀM TẠO HTML ICON HÌNH ẢNH / CHỮ FALLBACK ---
+function getItemIconHTML(item, size = 40) {
+    if (!item) return '';
+    let imgPath = `assets/item/${item.id}.png`;
+    let shortName = item.name.substring(0, 4);
+
+    return `
+        <div class="item-icon-box" style="width:${size}px; height:${size}px;">
+            <img src="${imgPath}" 
+                 style="width:100%; height:100%; object-fit:cover; border-radius:4px; border:1px solid #555;" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="item-fallback-text" style="display:none;">
+                ${shortName}
+            </div>
+        </div>
+    `;
+}
+
+
+function addTestGold() {
+    let p = gameState.player;
+    if (p) {
+        p.gold = (p.gold || 0) + 10000;
+        if (typeof renderShopUI === 'function') renderShopUI();
+        if (typeof updateHUD === 'function') updateHUD();
+    }
+}
+
+function toggleShop() {
+    let overlay = document.getElementById("shopOverlay");
+    if (overlay.style.display === "flex") {
+        overlay.style.display = "none";
+    } else {
+        overlay.style.display = "flex";
+        selectedInventoryIndex = null;
+        renderShopUI();
+    }
+}
+
+function switchShopTab(tabCategory) {
+    currentShopTab = tabCategory;
+    selectedInventoryIndex = null;
+    document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    renderShopUI();
+}
+
+function renderShopUI() {
+    let p = gameState.player;
+    if (!p) return;
+
+    // Cập nhật số Vàng
+    document.getElementById("playerGoldText").innerText = Math.floor(p.gold || 0);
+    document.getElementById("shopGoldText").innerText = Math.floor(p.gold || 0);
+
+    // 1. Render danh sách món đồ trong Shop
+    let grid = document.getElementById("shopItemsGrid");
+    grid.innerHTML = "";
+
+    Object.values(ITEMS_DATABASE).forEach(item => {
+        if (item.category === currentShopTab) {
+            let info = calculateItemPurchaseInfo(item.id, p);
+            let isSelected = (selectedInventoryIndex === null && selectedShopItemId === item.id);
+            
+            let card = document.createElement("div");
+            card.className = `shop-item-card ${isSelected ? 'selected' : ''}`;
+            card.onclick = () => selectShopItem(item.id);
+
+            card.innerHTML = `
+                ${getItemIconHTML(item, 38)}
+                <div style="flex:1;">
+                    <div style="font-weight:bold; color:#ffb300; font-size:12px;">${item.name}</div>
+                    <div style="font-size:11px; color:${p.gold >= info.finalPrice ? '#4caf50' : '#f44336'}; font-weight:bold; margin-top:2px;">
+                        ${info.finalPrice}💰 ${info.finalPrice < info.basePrice ? `<span style="font-size:10px; color:#888; text-decoration:line-through;">${info.basePrice}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    });
+
+    // 2. Render 6 ô Túi đồ
+    let invContainer = document.getElementById("inventorySlots");
+    invContainer.innerHTML = "";
+    for (let i = 0; i < 6; i++) {
+        let slot = document.createElement("div");
+        let itemId = p.inventory[i];
+        let isSelected = (selectedInventoryIndex === i);
+        
+        slot.className = `item-slot ${isSelected ? 'selected' : ''}`;
+        
+        if (itemId) {
+            let item = ITEMS_DATABASE[itemId];
+            slot.innerHTML = getItemIconHTML(item, 38);
+            slot.title = `${item.name}\nClick để chọn bán | Nhấp đúp để bán nhanh`;
+            slot.onclick = () => selectInventorySlot(i);
+            slot.ondblclick = () => sellItem(i);
+        } else {
+            slot.innerText = "Trống";
+            slot.style.color = "#555";
+        }
+        invContainer.appendChild(slot);
+    }
+
+    // Update Panel Chi tiết
+    updateDetailPanel();
+}
+
+function selectShopItem(itemId) {
+    selectedShopItemId = itemId;
+    selectedInventoryIndex = null; // Hủy chọn túi đồ
+    renderShopUI();
+}
+
+function selectInventorySlot(index) {
+    let p = gameState.player;
+    if (p && p.inventory[index]) {
+        selectedInventoryIndex = index;
+        renderShopUI();
+    }
+}
+
+function updateDetailPanel() {
+    let p = gameState.player;
+    let actionBtn = document.getElementById("shopActionButton");
+    let iconBox = document.getElementById("detailIconContainer");
+    let priceBox = document.getElementById("detailPriceBox");
+
+    // TRƯỜNG HỢP 1: ĐANG CHỌN MÓN ĐỒ TRONG TÚI ĐỂ BÁN
+    if (selectedInventoryIndex !== null && p.inventory[selectedInventoryIndex]) {
+        let itemId = p.inventory[selectedInventoryIndex];
+        let item = ITEMS_DATABASE[itemId];
+        let refund = Math.floor(item.cost * 0.7);
+
+        iconBox.innerHTML = getItemIconHTML(item, 44);
+        document.getElementById("detailTitle").innerText = item.name + " (Trong túi)";
+        document.getElementById("detailStats").innerText = item.desc;
+        document.getElementById("detailRecipe").innerText = "Nhấn nút bên dưới để bán trang bị này.";
+
+        priceBox.innerHTML = `Giá bán lại (70%): <span style="color:#ffb300; font-weight:bold;">+${refund}💰</span>`;
+
+        actionBtn.disabled = false;
+        actionBtn.style.background = "#e53935";
+        actionBtn.innerText = `BÁN TRANG BỊ (+${refund}💰)`;
+    } 
+    // TRƯỜNG HỢP 2: ĐANG CHỌN MÓN ĐỒ TRONG SHOP ĐỂ MUA
+    else if (selectedShopItemId && ITEMS_DATABASE[selectedShopItemId]) {
+        let item = ITEMS_DATABASE[selectedShopItemId];
+        let info = calculateItemPurchaseInfo(selectedShopItemId, p);
+
+        iconBox.innerHTML = getItemIconHTML(item, 44);
+        document.getElementById("detailTitle").innerText = item.name;
+        document.getElementById("detailStats").innerText = item.desc;
+
+        let recipeText = item.recipe.length > 0 ? "Cần linh kiện: " + item.recipe.map(r => ITEMS_DATABASE[r].name).join(", ") : "Trang bị sơ cấp";
+        document.getElementById("detailRecipe").innerText = recipeText;
+
+        priceBox.innerHTML = `
+            Giá gốc: <span style="color:#aaa;">${info.basePrice}💰</span> | 
+            Cần thêm: <span style="color:#ffb300; font-weight:bold;">${info.finalPrice}💰</span>
+        `;
+
+        if (p.gold < info.finalPrice) {
+            actionBtn.disabled = true;
+            actionBtn.style.background = "#555";
+            actionBtn.innerText = "KHÔNG ĐỦ VÀNG";
+        } else {
+            actionBtn.disabled = false;
+            actionBtn.style.background = "#4caf50";
+            actionBtn.innerText = "MUA TRANG BỊ";
+        }
+    } 
+    else {
+        iconBox.innerHTML = "";
+        document.getElementById("detailTitle").innerText = "Chọn một trang bị";
+        document.getElementById("detailStats").innerText = "";
+        document.getElementById("detailRecipe").innerText = "";
+        priceBox.innerHTML = "";
+        actionBtn.disabled = true;
+        actionBtn.style.background = "#555";
+        actionBtn.innerText = "MUA / BÁN";
+    }
+}
+
+function handleShopAction() {
+    if (selectedInventoryIndex !== null) {
+        sellItem(selectedInventoryIndex);
+        selectedInventoryIndex = null;
+    } else if (selectedShopItemId) {
+        buySelectedItem();
+    }
+}
+
+// Bắt phím P để mở nhanh Cửa Hàng
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'p' || e.key === 'P') {
+        toggleShop();
+    }
+});
+
+
+// Tính giá mua thực tế sau khi trừ đi linh kiện đang có trong Túi đồ
+function calculateItemPurchaseInfo(itemId, player) {
+    let item = ITEMS_DATABASE[itemId];
+    if (!item) return { finalPrice: 0, consumedSlots: [] };
+
+    let basePrice = item.cost;
+    let finalPrice = basePrice;
+    let consumedSlots = [];
+    
+    // Tạo bản sao túi đồ để kiểm tra ghép đồ
+    let tempInv = [...player.inventory];
+
+    if (item.recipe && item.recipe.length > 0) {
+        item.recipe.forEach(reqId => {
+            let foundIndex = tempInv.findIndex(invId => invId === reqId);
+            if (foundIndex !== -1) {
+                let reqItem = ITEMS_DATABASE[reqId];
+                finalPrice -= reqItem.cost;
+                consumedSlots.push(foundIndex);
+                tempInv[foundIndex] = null; // Đã sử dụng linh kiện này
+            }
+        });
+    }
+
+    return {
+        basePrice: basePrice,
+        finalPrice: Math.max(0, finalPrice),
+        consumedSlots: consumedSlots
+    };
+}
+
+function renderShopUI() {
+    let p = gameState.player;
+    if (!p) return;
+
+    // Cập nhật Vàng hiển thị
+    document.getElementById("playerGoldText").innerText = Math.floor(p.gold || 0);
+    document.getElementById("shopGoldText").innerText = Math.floor(p.gold || 0);
+
+    // Render danh sách món đồ theo Tab
+    let grid = document.getElementById("shopItemsGrid");
+    grid.innerHTML = "";
+
+    Object.values(ITEMS_DATABASE).forEach(item => {
+        if (item.category === currentShopTab) {
+            let info = calculateItemPurchaseInfo(item.id, p);
+            let card = document.createElement("div");
+            card.className = `shop-item-card ${selectedShopItemId === item.id ? 'selected' : ''}`;
+            card.onclick = () => selectShopItem(item.id);
+
+            card.innerHTML = `
+                <div style="font-weight:bold; color:#ffb300; font-size:13px;">${item.name}</div>
+                <div style="font-size:12px; color:${p.gold >= info.finalPrice ? '#4caf50' : '#f44336'}; font-weight:bold;">
+                    ${info.finalPrice}💰 ${info.finalPrice < info.basePrice ? `<span style="font-size:10px; color:#888; text-decoration:line-through;">${info.basePrice}</span>` : ''}
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    });
+
+    // Render 6 ô Túi đồ
+    let invContainer = document.getElementById("inventorySlots");
+    invContainer.innerHTML = "";
+    for (let i = 0; i < 6; i++) {
+        let slot = document.createElement("div");
+        slot.className = "item-slot";
+        let itemId = p.inventory[i];
+        if (itemId) {
+            let item = ITEMS_DATABASE[itemId];
+            slot.innerText = item.name.substring(0, 4);
+            slot.title = `${item.name}\n${item.desc}\n(Click đúp để bán lại 70% giá gốc)`;
+            slot.ondblclick = () => sellItem(i);
+        } else {
+            slot.innerText = "Trống";
+            slot.style.color = "#555";
+        }
+        invContainer.appendChild(slot);
+    }
+
+    if (selectedShopItemId) {
+        selectShopItem(selectedShopItemId);
+    }
+}
+
+function selectShopItem(itemId) {
+    selectedShopItemId = itemId;
+    let p = gameState.player;
+    let item = ITEMS_DATABASE[itemId];
+    if (!item || !p) return;
+
+    let info = calculateItemPurchaseInfo(itemId, p);
+
+    document.getElementById("detailTitle").innerText = item.name;
+    document.getElementById("detailStats").innerText = item.desc;
+    document.getElementById("detailBasePrice").innerText = info.basePrice;
+    document.getElementById("detailFinalPrice").innerText = info.finalPrice;
+
+    let recipeText = item.recipe.length > 0 ? "Cần linh kiện: " + item.recipe.map(r => ITEMS_DATABASE[r].name).join(", ") : "Trang bị sơ cấp (Không cần ghép)";
+    document.getElementById("detailRecipe").innerText = recipeText;
+
+    let buyBtn = document.getElementById("buyItemBtn");
+    if (p.gold < info.finalPrice) {
+        buyBtn.disabled = true;
+        buyBtn.style.background = "#555";
+        buyBtn.innerText = "KHÔNG ĐỦ VÀNG";
+    } else {
+        buyBtn.disabled = false;
+        buyBtn.style.background = "#4caf50";
+        buyBtn.innerText = "MUA TRANG BỊ";
+    }
+
+    renderShopUI();
+}
+
+function buySelectedItem() {
+    let p = gameState.player;
+    if (!p || !selectedShopItemId) return;
+
+    let item = ITEMS_DATABASE[selectedShopItemId];
+    let info = calculateItemPurchaseInfo(selectedShopItemId, p);
+
+    if (p.gold < info.finalPrice) return;
+
+    // Kiểm tra ô trống túi đồ
+    let freeSlots = 6 - p.inventory.length;
+    // Số ô sẽ giải phóng nhờ dùng linh kiện
+    let slotsFreed = info.consumedSlots.length;
+    
+    if (freeSlots + slotsFreed < 1) {
+        alert("Túi đồ đã đầy!");
+        return;
+    }
+
+    // Trừ tiền
+    p.gold -= info.finalPrice;
+
+    // Xóa các linh kiện đã dùng khỏi túi đồ (xóa từ chỉ số lớn về nhỏ để không lệch index)
+    info.consumedSlots.sort((a,b) => b - a).forEach(idx => {
+        let removedItemId = p.inventory[idx];
+        removeSingleItemStats(p, ITEMS_DATABASE[removedItemId]);
+        p.inventory.splice(idx, 1);
+    });
+
+    // Thêm trang bị mới vào túi
+    p.inventory.push(item.id);
+    applySingleItemStats(p, item);
+
+    renderShopUI();
+}
+
+function sellItem(slotIndex) {
+    let p = gameState.player;
+    if (!p || !p.inventory[slotIndex]) return;
+
+    let itemId = p.inventory[slotIndex];
+    let item = ITEMS_DATABASE[itemId];
+
+    // Bán lại bằng 70% giá gốc
+    let refund = Math.floor(item.cost * 0.7);
+    p.gold += refund;
+
+    removeSingleItemStats(p, item);
+    p.inventory.splice(slotIndex, 1);
+
+    renderShopUI();
+}
+
+// Bắt đầu áp dụng chỉ số của trang bị lên Tướng
+function applySingleItemStats(player, item) {
+    if (!item.stats) return;
+    if (item.stats.ad) player.stats.ad += item.stats.ad;
+    if (item.stats.ap) player.stats.ap += item.stats.ap;
+    if (item.stats.armor) player.stats.armor += item.stats.armor;
+    if (item.stats.maxHp) {
+        player.stats.maxHp += item.stats.maxHp;
+        player.stats.hp += item.stats.maxHp;
+    }
+    if (item.stats.speed) player.stats.speed += item.stats.speed;
+    if (item.stats.critRate) player.stats.critRate += item.stats.critRate;
+    if (item.stats.attackSpeedBonus) {
+        player.attackSpeedBonus = (player.attackSpeedBonus || 0) + item.stats.attackSpeedBonus;
+        recalculateAttackSpeed(player);
+    }
+}
+
+// Gỡ bỏ chỉ số trang bị khi bán hoặc ghép lên đồ cấp cao
+function removeSingleItemStats(player, item) {
+    if (!item.stats) return;
+    if (item.stats.ad) player.stats.ad -= item.stats.ad;
+    if (item.stats.ap) player.stats.ap -= item.stats.ap;
+    if (item.stats.armor) player.stats.armor -= item.stats.armor;
+    if (item.stats.maxHp) {
+        player.stats.maxHp -= item.stats.maxHp;
+        player.stats.hp = Math.min(player.stats.hp, player.stats.maxHp);
+    }
+    if (item.stats.speed) player.stats.speed -= item.stats.speed;
+    if (item.stats.critRate) player.stats.critRate -= item.stats.critRate;
+    if (item.stats.attackSpeedBonus) {
+        player.attackSpeedBonus = Math.max(0, (player.attackSpeedBonus || 0) - item.stats.attackSpeedBonus);
+        recalculateAttackSpeed(player);
+    }
 }

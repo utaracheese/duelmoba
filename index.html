@@ -425,7 +425,245 @@
             z-index: 15;
         }
 
-        
+        /* --- SHOP STYLES --- */
+        #shopToggleBtn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #ffb300;
+            color: #000;
+            font-weight: bold;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 60;
+            pointer-events: auto;
+            box-shadow: 0 0 10px rgba(255, 179, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #shopToggleBtn:hover { transform: scale(1.08); background: #ffa000; }
+
+        #goldDisplayHUD {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.85);
+            color: #ffb300;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid #ffb300;
+            pointer-events: none;
+            z-index: 60;
+        }
+
+        #shopOverlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 750px;
+            height: 500px;
+            background: rgba(15, 15, 20, 0.98);
+            border: 2px solid #ffb300;
+            border-radius: 8px;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            pointer-events: auto;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            color: white;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #1a1a24;
+            border-bottom: 1px solid #333;
+        }
+
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #121218;
+        }
+
+        .shop-tab {
+            padding: 6px 16px;
+            background: #252530;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #aaa;
+        }
+        .shop-tab.active { background: #ffb300; color: #000; border-color: #fff; }
+
+        .shop-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .shop-items-list {
+            flex: 2;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: max-content;
+            gap: 12px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+
+        .shop-item-card {
+            background: #1e1e28;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .shop-item-card:hover { border-color: #ffb300; background: #282836; }
+        .shop-item-card.selected { border-color: #00e5ff; background: #1a2a3a; }
+
+        .shop-item-detail {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .inventory-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #121218;
+            border-top: 1px solid #333;
+            align-items: center;
+        }
+
+        .item-slot {
+            width: 42px; height: 42px;
+            background: #222;
+            border: 1.5px solid #555;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        .item-slot:hover { border-color: #ff5722; }
+
+        /* Styling cho Icon Trang bị & Fallback Chữ */
+        .item-icon-box {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .item-fallback-text {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #ffb300;
+            text-align: center;
+            background: #2a2a38;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 2px;
+            line-height: 1.1;
+        }
+
+        .shop-item-card {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-slot.selected {
+            border-color: #ffb300 !important;
+            box-shadow: 0 0 8px rgba(255, 179, 0, 0.6);
+        }
+
+            /* UI Ô TRANG BỊ TRÊN HUD CHÍNH (BÊN CẠNH SHOP) */
+        #hudInventoryContainer {
+            position: absolute;
+            bottom: 20px;
+            left: 80px;
+            display: flex;
+            gap: 6px;
+            z-index: 60;
+            pointer-events: auto;
+        }
+        .hud-item-slot {
+            width: 44px;
+            height: 44px;
+            background: rgba(15, 15, 20, 0.9);
+            border: 1.5px solid #555;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 6px rgba(0,0,0,0.8);
+        }
+        .hud-item-slot.empty {
+            border-color: #333;
+            color: #555;
+            font-size: 10px;
+        }   
+
+        /* HIỆU ỨNG HỒI NỘI TẠI TRANG BỊ (LÀM TỐI & VÒNG TRÒN TIME) */
+        .item-cd-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            z-index: 5;
+        }
+        .item-cd-circle {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .item-cd-text {
+            color: #ffeb3b;
+            font-weight: bold;
+            font-size: 11px;
+            text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+            z-index: 6;
+        }
+
     </style>
 </head>
 <body>
@@ -450,21 +688,23 @@
         </div>
     </div>
 
+    <!-- THAY THẾ PHẦN #heroSelectScreen TRONG index.html -->
     <div id="heroSelectScreen" style="display: none;">
         <h2>Chọn Tướng Lĩnh</h2>
         <div class="hero-list">
             <div class="hero-card selected" id="card_robotR1" onclick="selectHero('robotR1')">
                 <h3>Robot R1</h3>
-                <p style="font-size: 12px; color: #aaa; margin-top: 10px;">
+                <div style="font-size:11px; color:#00e5ff; margin-top:4px;">Pháp sư | Tầm đánh: Xa</div>
+                <p style="font-size: 12px; color: #aaa; margin-top: 8px;">
                     Chiến binh cơ khí tầm xa. Sử dụng quả cầu điện tích và hỏa cầu khổng lồ.
                 </p>
             </div>
 
-            <!-- THÊM TƯỚNG PK CHEESE VÀO ĐÂY -->
             <div class="hero-card" id="card_cheese" onclick="selectHero('cheese')">
                 <h3>PK cheese</h3>
-                <p style="font-size: 12px; color: #ffeb3b; margin-top: 10px;">
-                    Sạ thủ Phô Mai cơ động cao. Đòn đánh tích tụ gây choáng, Lãnh Địa Bơ gấp đôi tốc đánh!
+                <div style="font-size:11px; color:#ffeb3b; margin-top:4px;">Xạ thủ | Tầm đánh: Xa</div>
+                <p style="font-size: 12px; color: #aaa; margin-top: 8px;">
+                    Xạ thủ Phô Mai cơ động cao. Đòn đánh tích tụ gây choáng, Lãnh Địa Bơ gấp đôi tốc đánh!
                 </p>
             </div>
         </div>
@@ -507,6 +747,65 @@
 
     <!-- HUD game chơi -->
     <div id="hud">
+        <!-- Nút mở Shop & Vàng HUD -->
+        <div id="goldDisplayHUD">💰 <span id="playerGoldText">0</span></div>
+        <button id="shopToggleBtn" onclick="toggleShop()">🛒</button>
+            
+        <!-- THÊM TÚI ĐỒ NẰM NGOÀI HUD CHÍNH BÊN CẠNH NÚT SHOP -->
+        <div id="hudInventoryContainer">
+            <!-- 6 ô item HUD nạp bằng JS -->
+        </div>
+        <button id="shopToggleBtn" onclick="toggleShop()">🛒</button>
+
+        <!-- UI Cửa hàng Overlay -->
+        <div id="shopOverlay">
+            <div class="shop-header">
+                <h3 style="margin:0; color:#ffb300;">CỬA HÀNG TRANG BỊ (Phím P)</h3>
+                <div>Thẻ vàng hiện có: <span id="shopGoldText" style="color:#ffb300; font-weight:bold;">0</span>💰</div>
+                <button onclick="toggleShop()" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">✖</button>
+            </div>
+
+            <div class="shop-tabs">
+                <div class="shop-tab active" onclick="switchShopTab('ad')">Công Vật Lý</div>
+                <div class="shop-tab" onclick="switchShopTab('ap')">Công Phép</div>
+                <div class="shop-tab" onclick="switchShopTab('def')">Phòng Thủ</div>
+                <div class="shop-tab" onclick="switchShopTab('speed')">Giày / Tốc Độ</div>
+            </div>
+        
+            <div class="shop-body">
+                <div class="shop-items-list" id="shopItemsGrid">
+                    <!-- Danh sách trang bị nạp bằng JS -->
+                </div>
+            
+                <div class="shop-item-detail" id="shopItemDetail">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div id="detailIconContainer"></div>
+                            <h4 id="detailTitle" style="margin:0; color:#00e5ff; font-size: 15px;">Chọn một trang bị</h4>
+                        </div>
+                        <div id="detailStats" style="font-size:12px; color:#ccc; line-height:1.5;"></div>
+                        <hr style="border-color:#333; margin:10px 0;">
+                        <div id="detailRecipe" style="font-size:11px; color:#aaa;"></div>
+                    </div>
+
+                    <div>
+                        <div id="detailPriceBox" style="font-size:13px; margin-bottom:8px;">
+                            Giá mua gốc: <span id="detailBasePrice" style="color:#aaa;">0</span>💰<br>
+                            Cần thêm: <span id="detailFinalPrice" style="color:#ffb300; font-weight:bold;">0</span>💰
+                        </div>
+                        <!-- Nút hành động (Mua hoặc Bán) -->
+                        <button id="shopActionButton" class="btn" style="width:100%; margin:0; background:#4caf50;" onclick="handleShopAction()">MUA TRANG BỊ</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="inventory-bar">
+                <span style="font-size:12px; color:#aaa; margin-right:10px;">Túi đồ (6 ô):</span>
+                <div id="inventorySlots" style="display:flex; gap:8px;">
+                    <!-- 6 Ô trang bị nạp bằng JS -->
+                </div>
+            </div>
+        </div>
         <div id="livesHUD">
             <div>Bạn: <span id="localLivesText" style="color: #4caf50; font-weight: bold;">5</span></div>
             <div style="color: #aaa;">VS</div>
@@ -534,6 +833,11 @@
             <button onclick="updateDummyResist()" class="btn" style="padding: 6px; font-size: 12px; margin: 0 0 10px 0; width: 100%; background: #4caf50;">Cập nhật chỉ số</button>
             <hr style="border-color: #444; margin: 10px 0;">
             <button onclick="addOneLevel()" class="btn" style="padding: 6px; font-size: 12px; margin: 0; width: 100%; background: #2196f3;">+1 Cấp độ (Level)</button>
+            <hr style="border-color: #444; margin: 10px 0;">
+            <button onclick="addOneLevel()" class="btn" style="padding: 6px; font-size: 12px; margin: 0 0 6px 0; width: 100%; background: #2196f3;">+1 Cấp độ (Level)</button>
+        
+            <!-- THÊM NÚT NẠP 10.000 VÀNG VÀO ĐÂY -->
+            <button onclick="addTestGold()" class="btn" style="padding: 6px; font-size: 12px; margin: 0; width: 100%; background: #ffb300; color: #000; font-weight: bold;">+10,000 Vàng 💰</button>
         </div>
 
         <div id="lobbyInfo">
@@ -685,6 +989,8 @@
 <script src="hero/robotR1.js"></script>
 <script src="hero/cheese.js"></script> <!-- NẠP THÊM FILE NÀY -->
 <script src="mon.js"></script>
+<script src="item.js"></script>
+
 
 </body>
 </html>

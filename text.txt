@@ -1,0 +1,18 @@
+sửa thẻ prenium: 
+guardian :giảm 10% mọi nguồn sát thương nhận vào rời giao tranh (ko gây dame/ nhận dame) trong 7s hồi 1%hp mỗi 2s, tiêu diệt quái tăng 3hp tối đa
+pháo thủ : Giảm 50% tốc chạy hiện có (không giảm lượng cộng sau này). Tăng +25% Tốc đánh, +25 Công vật lý, +15% Tỉ lệ chí mạng & +10% Sát thương chí mạng, +50 song giáp
+quỷ quyết : Tắt hồi phục tự nhiên. Tăng +10% Hút máu, thêm (Hồi HP cơ bản trước đó * 2)% Hút máu. Nâng hồi phục HP sau này tính vào hút máu với hệ số x0.5.
+thánh quyết : Tắt hồi phục tự nhiên. Tăng +20% Hút máu phép, thêm (Hồi HP cơ bản trước đó * 3)% Hút máu phép. Nâng hồi phục HP sau này tính vào hút máu phép với hệ số x1
+gặm mòn : Gây sát thương khiến địch bị giảm 10% khả năng hồi phục trong 2.5s. Mỗi giây địch chịu thêm (1.5% AD + 1.5% AP + 0.5% HP của bản thân) sát thương phép.(khi nhận sát thương chỉ reset thời gian ko reset chiêu để hiệu ứng đốt vẫn chạy)'
+nứt đố đổ vách : tăng 1%exp cần mỗi 2s tăng 10% vàng nhận được khi tiêu diệt quái
+
+thêm : 
+quay ngược thời gian : 
+-thêm biến kiểm tra vàng nhận được từ đầu game đến hiện tại (vàng nhận được chứ ko phải spam bán đồ là nhận)
+-nhận thẻ này sẽ xóa hết item bản thân đang có và xóa hết vàng (reset hoàn toàn)
+-sau khi xóa mỗi 100 vàng +1 công vật lý và 2 công phép và 10hp
+
+dồn dập :
+- mỗi lần chiêu gây dame sẽ +1 điểm lên địch, nếu đủ 10 điểm sẽ gây (100% công vật lý) công vật lý (áp dụng lên quái)
+
+chí tử kết liễu :sau khi gây dame nếu hp của địch còn 10% đổ xuống lập tức kết liễu mục tiêu (áp dụng cả vào quái)

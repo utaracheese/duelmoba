@@ -16,7 +16,8 @@ class Monster extends Entity {
         this.spawnX = x;
         this.spawnY = y;
         this.monsterType = type; 
-
+        this.rangeType = 'Gần';
+        
         let elapsedMinutes = (performance.now() - gameState.gameStartTime) / 60000;
         
         // Thiết lập chỉ số tăng tiến của quái theo thời gian thực
@@ -29,26 +30,26 @@ class Monster extends Entity {
         let hpMultiplier = 1 + (0.25 * elapsedMinutes); 
 
         if (type === 'blue' || type === 'red') {
-            maxHp = 125 * hpMultiplier;
-            ad = 10 + elapsedMinutes;
+            maxHp = 450 * hpMultiplier;
+            ad = 20 + elapsedMinutes;
             armor = 45;
             speed = 3.0;
         } else if (type === 'monkey') {
-            maxHp = 100 * hpMultiplier;
-            ad = 5 + (1 * elapsedMinutes);
+            maxHp = 300 * hpMultiplier;
+            ad = 10 + (1 * elapsedMinutes);
             armor = 20;
             speed = 3.5;
         } else if (type === 'golem') {
-            maxHp = 250 * hpMultiplier;
-            ad = 20 + (5 * elapsedMinutes);
+            maxHp = 775 * hpMultiplier;
+            ad = 40 + (5 * elapsedMinutes);
             armor = 50 + (5 * elapsedMinutes);
-            speed = 2.4;
+            speed = 2.65;
         } else if (type === 'mini_golem' && parentStats) {
             // Golem con kế thừa gián tiếp từ lượng HP đã nhân hệ số của Golem mẹ
-            maxHp = parentStats.maxHp * 0.20;
+            maxHp = parentStats.maxHp * 0.10;
             ad = parentStats.ad * 0.20;
             armor = parentStats.armor * 0.20;
-            speed = parentStats.speed * 1.2;
+            speed = parentStats.speed * 1.1;
         }
 
         this.stats = new Stats({

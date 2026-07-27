@@ -2,6 +2,7 @@ HERO_PRESETS['cheese'] = {
     name: "PK cheese",
     radius: 22,
     color: "#fbc02d",
+    rangeType: "Xa",
     stats: {
         maxHp: 475,
         hpRegen: 4,
@@ -28,6 +29,7 @@ class Cheese extends Entity {
     constructor(x, y) {
         const config = HERO_PRESETS['cheese'];
         super(x, y, config.radius, config.color, false, config.stats);
+        this.rangeType = config.rangeType || 'Xa';
 
         // Thiết lập thời gian hồi chiêu và tiêu hao mana
         this.maxCooldowns = { '1': 1.5, '2': 6.0, '3': 20.0 };
