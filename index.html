@@ -30,6 +30,151 @@
             height: 100vh;
         }
 
+        /* ================= WELCOME MODAL STYLES ================= */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .welcome-card {
+            background-color: #18181c;
+            border: 1px solid #2d2d35;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 850px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+        }
+
+        .welcome-content {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .welcome-left {
+            flex: 0 0 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0d0d10;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #2d2d35;
+        }
+
+        .qr-code-img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .welcome-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #58a6ff;
+            padding-bottom: 8px;
+        }
+
+        .welcome-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .info-row {
+            font-size: 0.95rem;
+            color: #c9d1d9;
+            line-height: 1.5;
+        }
+
+        .btn-start {
+            align-self: flex-end;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #2b2b36;
+            color: #ffffff;
+            border: 1px solid #3c3c4a;
+            padding: 10px 18px 10px 24px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-start:hover {
+            background-color: #3b3b4a;
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+
+        .arrow-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #238636;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-start:hover .arrow-icon {
+            background-color: #2ea043;
+            transform: translateX(4px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-content {
+                flex-direction: column;
+            }
+            .welcome-left {
+                flex: none;
+                width: 100%;
+            }
+            .welcome-right {
+                min-height: auto;
+            }
+            .btn-start {
+                align-self: center;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         /* Header & Toolbar */
         .toolbar {
             height: 50px;
@@ -334,6 +479,40 @@
     </style>
 </head>
 <body>
+
+    <!-- Bảng Welcome & QR Code Modal -->
+    <div id="welcome-modal" class="welcome-overlay">
+        <div class="welcome-card">
+            <div class="welcome-content">
+                <!-- Cột bên trái: Ảnh QR Code -->
+                <div class="welcome-left">
+                    <img src="assets/qr.png" alt="QR Code" class="qr-code-img" onerror="this.src='data:image/svg+xml;charset=utf-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23666\' stroke-width=\'1\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/><path d=\'M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7z\'/></svg>'">
+                </div>
+
+                <!-- Cột bên phải: Thông tin & Nút bắt đầu -->
+                <div class="welcome-right">
+                    <h1 class="welcome-title">CHÀO MỪNG ĐẾN VỚI GUI EDITOR!</h1>
+                    <div class="welcome-info">
+                        <p class="info-row">📌 Quét mã QR để cập nhật thông tin và nhận hỗ trợ mới nhất.</p>
+                        <p class="info-row">💡 Công cụ giúp ghép và chỉnh sửa giao diện GUI Minecraft chuyên nghiệp.</p>
+                        <p class="info-row">🚀 Tự động tùy chỉnh kích thước, xoay, lật và xuất file PNG chuẩn định dạng.</p>
+                    </div>
+
+                    <!-- Nút Bắt đầu sử dụng với icon mũi tên màu xanh -->
+                    <button id="start-app-btn" class="btn-start">
+                        <span>Bắt đầu sử dụng</span>
+                        <div class="arrow-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Top Toolbar -->
         <header class="toolbar">
@@ -462,7 +641,6 @@
 
     <!-- JAVASCRIPT GỘP VÀO ĐÂY -->
     <script>
-
         const GUI_ITEMS = [
             { id: 'anvil', name: 'Anvil', path: 'assets/gui/anvil.png' },
             { id: 'beacon', name: 'Beacon', path: 'assets/gui/beacon.png' },
@@ -715,6 +893,15 @@
         }
 
         function initEventListeners() {
+            // Đóng Modal Welcome
+            const welcomeModal = document.getElementById('welcome-modal');
+            const startAppBtn = document.getElementById('start-app-btn');
+            if (startAppBtn && welcomeModal) {
+                startAppBtn.addEventListener('click', () => {
+                    welcomeModal.style.display = 'none';
+                });
+            }
+
             const uploadInput = document.getElementById('file-upload');
             uploadInput.addEventListener('change', (e) => {
                 if (e.target.files && e.target.files[0]) {
