@@ -1,3 +1,5 @@
+--- START OF FILE text/html ---
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -5,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Resource Pack GUI Editor</title>
     
-    <!-- CSS GỘP VÀO ĐÂY -->
     <style>
         /* Reset & Base Styles */
         * {
@@ -157,24 +158,6 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        @media (max-width: 768px) {
-            .welcome-content {
-                flex-direction: column;
-            }
-            .welcome-left {
-                flex: none;
-                width: 100%;
-            }
-            .welcome-right {
-                min-height: auto;
-            }
-            .btn-start {
-                align-self: center;
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
         /* Header & Toolbar */
         .toolbar {
             height: 50px;
@@ -238,6 +221,17 @@
             background-color: #2ea043 !important;
         }
 
+        .btn-sticker {
+            background-color: #8957e5 !important;
+            border-color: #a371f7 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .btn-sticker:hover {
+            background-color: #9e6aed !important;
+        }
+
         .btn-danger {
             background-color: #da3633 !important;
             border-color: #f85149 !important;
@@ -264,7 +258,7 @@
 
         /* Sidebars */
         .sidebar {
-            width: 260px;
+            width: 280px;
             background-color: #18181c;
             border-color: #2d2d35;
             display: flex;
@@ -286,11 +280,11 @@
         }
 
         .sidebar-header h3 {
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #8b949e;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .sidebar-header input[type="text"] {
@@ -301,10 +295,6 @@
             padding: 6px 10px;
             border-radius: 4px;
             font-size: 13px;
-        }
-
-        .sidebar-header input[type="text"]:focus {
-            outline: 1px solid #58a6ff;
         }
 
         /* GUI Selection List */
@@ -336,13 +326,71 @@
             font-weight: 600;
         }
 
+        /* Layer List Panel */
+        .layer-section {
+            display: flex;
+            flex-direction: column;
+            max-height: 220px;
+            border-bottom: 1px solid #2d2d35;
+        }
+
+        .layer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .layer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background-color: #0d0d10;
+            border: 1px solid #2d2d35;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .layer-item.active {
+            border-color: #58a6ff;
+            background-color: #1c2128;
+        }
+
+        .layer-item-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 130px;
+        }
+
+        .layer-item-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .layer-btn {
+            padding: 2px 5px;
+            font-size: 10px;
+            background: #2b2b36;
+            border: 1px solid #3c3c4a;
+            border-radius: 2px;
+        }
+
         /* Properties Panel */
         .properties-panel {
             padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             overflow-y: auto;
+            flex: 1;
         }
 
         .prop-group {
@@ -411,9 +459,9 @@
 
         .prop-info {
             margin-top: auto;
-            padding-top: 12px;
+            padding-top: 8px;
             border-top: 1px solid #2d2d35;
-            font-size: 12px;
+            font-size: 11px;
             color: #8b949e;
         }
 
@@ -422,7 +470,6 @@
             flex: 1;
             position: relative;
             background-color: #0a0a0c;
-            /* Grid Nền Photoshop (Transparent Checkerboard) */
             background-image: 
                 linear-gradient(45deg, #16161a 25%, transparent 25%), 
                 linear-gradient(-45deg, #16161a 25%, transparent 25%), 
@@ -480,27 +527,21 @@
 </head>
 <body>
 
-    <!-- Bảng Welcome & QR Code Modal -->
+    <!-- Welcome Modal -->
     <div id="welcome-modal" class="welcome-overlay">
         <div class="welcome-card">
             <div class="welcome-content">
-                <!-- Cột bên trái: Ảnh QR Code -->
                 <div class="welcome-left">
                     <img src="assets/qr.png" alt="QR Code" class="qr-code-img" onerror="this.src='data:image/svg+xml;charset=utf-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23666\' stroke-width=\'1\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/><path d=\'M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7z\'/></svg>'">
                 </div>
-
-                <!-- Cột bên phải: Thông tin & Nút bắt đầu -->
                 <div class="welcome-right">
-                    <h1 class="welcome-title">CHÀO MỪNG ĐẾN VỚI GUI EDITOR!</h1>
+                    <h1 class="welcome-title">[tên tài khoản ngân hàng]</h1>
                     <div class="welcome-info">
-                        <p class="info-row">📌 Quét mã QR để cập nhật thông tin và nhận hỗ trợ mới nhất.</p>
-                        <p class="info-row">💡 Công cụ giúp ghép và chỉnh sửa giao diện GUI Minecraft chuyên nghiệp.</p>
-                        <p class="info-row">🚀 Tự động tùy chỉnh kích thước, xoay, lật và xuất file PNG chuẩn định dạng.</p>
+                        <p class="info-row">[số tài khoản]</p>
+                        <p class="info-row">donate cho tôi để tôi lấy động lực ra pack🔞 tiếp nhá<3.</p>
+                        <p class="info-row">web đếch có hướng dẫn khuyến khích tự mò :Đ.</p>
                     </div>
-
-                    <!-- Nút Bắt đầu sử dụng với icon mũi tên màu xanh -->
                     <button id="start-app-btn" class="btn-start">
-                        <span>Bắt đầu sử dụng</span>
                         <div class="arrow-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -523,13 +564,19 @@
                 <button id="btn-undo" title="Hoàn tác (Ctrl+Z)">↩️ Undo</button>
                 <button id="btn-redo" title="Làm lại (Ctrl+Y)">↪️ Redo</button>
                 <span class="divider"></span>
-                <button id="btn-center" title="Căn giữa GUI">🎯 Center Image</button>
-                <button id="btn-fit" title="Thu phóng vừa khung">📐 Fit Image</button>
+                <button id="btn-center" title="Căn giữa">🎯 Center</button>
+                <button id="btn-fit" title="Thu phóng vừa GUI">📐 Fit GUI</button>
                 <button id="btn-reset" title="Đặt lại ảnh">🔄 Reset</button>
-                <button id="btn-delete" class="btn-danger" title="Xóa ảnh (Delete)">🗑️ Delete</button>
+                <button id="btn-delete" class="btn-danger" title="Xóa đối tượng chọn">🗑️ Delete</button>
                 <span class="divider"></span>
-                <label for="file-upload" class="btn-upload">📁 Upload Image</label>
-                <input type="file" id="file-upload" accept="image/*" hidden>
+                
+                <!-- Nút Upload Nền & Sticker -->
+                <label for="bg-upload" class="btn-upload">🖼️ Nền dưới GUI</label>
+                <input type="file" id="bg-upload" accept="image/*" hidden>
+
+                <label for="sticker-upload" class="btn-upload btn-sticker">✨ Thêm Sticker (Trên GUI)</label>
+                <input type="file" id="sticker-upload" accept="image/*" multiple hidden>
+
                 <button id="btn-download" class="btn-primary">💾 Export PNG</button>
             </div>
         </header>
@@ -565,10 +612,21 @@
                 </div>
             </section>
 
-            <!-- Right Sidebar: Layer Properties -->
+            <!-- Right Sidebar: Layer Manager & Properties -->
             <aside class="sidebar sidebar-right">
+                <!-- Layers Manager Panel -->
                 <div class="sidebar-header">
-                    <h3>Properties</h3>
+                    <h3>Quản lý Layer Sticker</h3>
+                </div>
+                <div class="layer-section">
+                    <div class="layer-list" id="layer-list">
+                        <!-- Render danh sách layer bằng JS -->
+                    </div>
+                </div>
+
+                <!-- Properties Panel -->
+                <div class="sidebar-header">
+                    <h3>Thuộc tính Layer</h3>
                 </div>
                 <div class="properties-panel" id="properties-panel">
                     <div class="prop-group">
@@ -636,10 +694,10 @@
         </main>
     </div>
 
-    <!-- Canvas phụ ẩn dùng để Export PNG -->
+    <!-- Canvas phụ dùng Export PNG -->
     <canvas id="export-canvas" style="display: none;"></canvas>
 
-    <!-- JAVASCRIPT GỘP VÀO ĐÂY -->
+    <!-- JAVASCRIPT -->
     <script>
         const GUI_ITEMS = [
             { id: 'anvil', name: 'Anvil', path: 'assets/gui/anvil.png' },
@@ -684,10 +742,17 @@
             guiWidth: 256,
             guiHeight: 256,
 
-            userImage: null,
-            transform: {
+            // Ảnh nền bên dưới GUI
+            bgImage: null,
+            bgTransform: {
                 x: 0, y: 0, width: 100, height: 100, rotation: 0, opacity: 1, flipX: false, flipY: false, aspectRatio: 1
             },
+
+            // Danh sách Sticker (nằm trên GUI)
+            stickers: [], // [{ id, name, img, x, y, width, height, rotation, opacity, flipX, flipY, aspectRatio }]
+            
+            // Đối tượng đang được chọn: { type: 'bg' | 'sticker', index: number | null }
+            selectedTarget: null,
 
             zoom: 1, panX: 0, panY: 0,
             isDragging: false, isResizing: false, isRotating: false, isPanning: false,
@@ -764,7 +829,6 @@
             };
 
             state.guiImage.onerror = () => {
-                // Tự động chuyển sang ảnh mẫu giả định nếu không tìm thấy file ảnh PNG thật
                 state.guiImage.src = getFallbackGuiTexture(guiItem.name);
             };
 
@@ -794,6 +858,14 @@
             requestAnimationFrame(render);
         }
 
+        // Lấy dữ liệu Transform của đối tượng đang chọn
+        function getActiveTransform() {
+            if (!state.selectedTarget) return null;
+            if (state.selectedTarget.type === 'bg') return state.bgTransform;
+            if (state.selectedTarget.type === 'sticker') return state.stickers[state.selectedTarget.index];
+            return null;
+        }
+
         function render() {
             canvas.width = workspace.clientWidth;
             canvas.height = workspace.clientHeight;
@@ -805,40 +877,53 @@
             ctx.translate(state.panX, state.panY);
             ctx.scale(state.zoom, state.zoom);
 
-            if (state.userImage) {
-                ctx.save();
-                ctx.globalAlpha = state.transform.opacity;
-
-                const cx = state.transform.x + state.transform.width / 2;
-                const cy = state.transform.y + state.transform.height / 2;
-
-                ctx.translate(cx, cy);
-                ctx.rotate((state.transform.rotation * Math.PI) / 180);
-                ctx.scale(state.transform.flipX ? -1 : 1, state.transform.flipY ? -1 : 1);
-
-                ctx.drawImage(
-                    state.userImage,
-                    -state.transform.width / 2,
-                    -state.transform.height / 2,
-                    state.transform.width,
-                    state.transform.height
-                );
-                ctx.restore();
-
-                drawTransformBox(ctx);
+            // 1. RENDER ẢNH NỀN (BÊN DƯỚI GUI)
+            if (state.bgImage) {
+                renderSingleImage(ctx, state.bgImage, state.bgTransform);
             }
 
+            // 2. RENDER GUI
             if (state.guiLoaded) {
                 ctx.drawImage(state.guiImage, 0, 0, state.guiWidth, state.guiHeight);
+            }
+
+            // 3. RENDER CÁC STICKER (TRÊN GUI)
+            state.stickers.forEach(stk => {
+                renderSingleImage(ctx, stk.img, stk);
+            });
+
+            // 4. VẼ KHUNG CHỌN / TRANSFORM BOX CHO ĐỐI TƯỢNG ĐANG ĐƯỢC CHỌN
+            const activeT = getActiveTransform();
+            if (activeT) {
+                drawTransformBox(ctx, activeT);
             }
 
             ctx.restore();
         }
 
-        function drawTransformBox(ctx) {
+        function renderSingleImage(context, imgObj, transform) {
+            context.save();
+            context.globalAlpha = transform.opacity;
+
+            const cx = transform.x + transform.width / 2;
+            const cy = transform.y + transform.height / 2;
+
+            context.translate(cx, cy);
+            context.rotate((transform.rotation * Math.PI) / 180);
+            context.scale(transform.flipX ? -1 : 1, transform.flipY ? -1 : 1);
+
+            context.drawImage(
+                imgObj,
+                -transform.width / 2,
+                -transform.height / 2,
+                transform.width,
+                transform.height
+            );
+            context.restore();
+        }
+
+        function drawTransformBox(ctx, t) {
             ctx.save();
-            
-            const t = state.transform;
             const cx = t.x + t.width / 2;
             const cy = t.y + t.height / 2;
 
@@ -902,18 +987,27 @@
                 });
             }
 
-            const uploadInput = document.getElementById('file-upload');
-            uploadInput.addEventListener('change', (e) => {
+            // Upload Ảnh Nền (Background)
+            const bgUpload = document.getElementById('bg-upload');
+            bgUpload.addEventListener('change', (e) => {
                 if (e.target.files && e.target.files[0]) {
-                    loadUserImageFile(e.target.files[0]);
+                    loadBgImageFile(e.target.files[0]);
+                }
+            });
+
+            // Upload Stickers (Multi)
+            const stickerUpload = document.getElementById('sticker-upload');
+            stickerUpload.addEventListener('change', (e) => {
+                if (e.target.files) {
+                    Array.from(e.target.files).forEach(file => addStickerFile(file));
                 }
             });
 
             workspace.addEventListener('dragover', (e) => e.preventDefault());
             workspace.addEventListener('drop', (e) => {
                 e.preventDefault();
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    loadUserImageFile(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files) {
+                    Array.from(e.dataTransfer.files).forEach(file => addStickerFile(file));
                 }
             });
 
@@ -932,10 +1026,10 @@
             document.getElementById('zoom-400').onclick = () => setZoom(4.0);
             document.getElementById('zoom-fit').onclick = () => fitCanvasToScreen();
 
-            document.getElementById('btn-center').onclick = centerImage;
-            document.getElementById('btn-fit').onclick = fitImageToGui;
-            document.getElementById('btn-reset').onclick = resetTransform;
-            document.getElementById('btn-delete').onclick = deleteImage;
+            document.getElementById('btn-center').onclick = centerActiveImage;
+            document.getElementById('btn-fit').onclick = fitActiveImageToGui;
+            document.getElementById('btn-reset').onclick = resetActiveTransform;
+            document.getElementById('btn-delete').onclick = deleteActiveTarget;
             document.getElementById('btn-download').onclick = exportPNG;
 
             document.getElementById('btn-undo').onclick = undo;
@@ -948,28 +1042,154 @@
                 } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
                     redo();
                 } else if (e.key === 'Delete' || e.key === 'Backspace') {
-                    deleteImage();
+                    deleteActiveTarget();
                 }
             });
         }
 
-        function loadUserImageFile(file) {
+        // Tải ảnh làm Nền bên dưới GUI
+        function loadBgImageFile(file) {
             if (!file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    state.userImage = img;
-                    state.transform.aspectRatio = img.width / img.height;
-                    state.transform.width = img.width;
-                    state.transform.height = img.height;
-                    centerImage();
+                    state.bgImage = img;
+                    state.bgTransform.aspectRatio = img.width / img.height;
+                    state.bgTransform.width = img.width;
+                    state.bgTransform.height = img.height;
+                    state.selectedTarget = { type: 'bg', index: null };
+                    centerActiveImage();
+                    renderLayerList();
                     saveHistoryState();
                     requestRender();
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        // Thêm Sticker mới (Nằm trên GUI)
+        function addStickerFile(file) {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const sticker = {
+                        id: 'sticker_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        name: file.name,
+                        img: img,
+                        x: Math.round((state.guiWidth - img.width) / 2),
+                        y: Math.round((state.guiHeight - img.height) / 2),
+                        width: img.width,
+                        height: img.height,
+                        rotation: 0,
+                        opacity: 1,
+                        flipX: false,
+                        flipY: false,
+                        aspectRatio: img.width / img.height
+                    };
+                    state.stickers.push(sticker);
+                    state.selectedTarget = { type: 'sticker', index: state.stickers.length - 1 };
+                    renderLayerList();
+                    updatePropertiesPanel();
+                    saveHistoryState();
+                    requestRender();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Cập nhật Bảng quản lý Layer ở Sidebar Phải
+        function renderLayerList() {
+            const list = document.getElementById('layer-list');
+            list.innerHTML = '';
+
+            // Render Các Sticker (Theo thứ tự tầng từ trên xuống dưới)
+            for (let i = state.stickers.length - 1; i >= 0; i--) {
+                const stk = state.stickers[i];
+                const item = document.createElement('div');
+                item.className = 'layer-item' + (state.selectedTarget?.type === 'sticker' && state.selectedTarget?.index === i ? ' active' : '');
+                
+                item.innerHTML = `
+                    <div class="layer-item-title">
+                        <span>✨</span>
+                        <span>${stk.name}</span>
+                    </div>
+                    <div class="layer-item-controls">
+                        <button class="layer-btn" onclick="moveStickerLayer(${i}, 1)" title="Lên trên">▲</button>
+                        <button class="layer-btn" onclick="moveStickerLayer(${i}, -1)" title="Xuống dưới">▼</button>
+                        <button class="layer-btn" onclick="deleteStickerByIndex(${i})" title="Xóa">✕</button>
+                    </div>
+                `;
+
+                item.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    state.selectedTarget = { type: 'sticker', index: i };
+                    renderLayerList();
+                    updatePropertiesPanel();
+                    requestRender();
+                });
+
+                list.appendChild(item);
+            }
+
+            // Render Ảnh Nền bên dưới
+            if (state.bgImage) {
+                const bgItem = document.createElement('div');
+                bgItem.className = 'layer-item' + (state.selectedTarget?.type === 'bg' ? ' active' : '');
+                bgItem.innerHTML = `
+                    <div class="layer-item-title">
+                        <span>🖼️</span>
+                        <span>Ảnh Nền (Dưới GUI)</span>
+                    </div>
+                    <div class="layer-item-controls">
+                        <button class="layer-btn" onclick="deleteBgImage()" title="Xóa">✕</button>
+                    </div>
+                `;
+                bgItem.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    state.selectedTarget = { type: 'bg', index: null };
+                    renderLayerList();
+                    updatePropertiesPanel();
+                    requestRender();
+                });
+                list.appendChild(bgItem);
+            }
+        }
+
+        function moveStickerLayer(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= state.stickers.length) return;
+            
+            const temp = state.stickers[index];
+            state.stickers[index] = state.stickers[newIndex];
+            state.stickers[newIndex] = temp;
+
+            state.selectedTarget = { type: 'sticker', index: newIndex };
+            renderLayerList();
+            saveHistoryState();
+            requestRender();
+        }
+
+        function deleteStickerByIndex(index) {
+            state.stickers.splice(index, 1);
+            state.selectedTarget = null;
+            renderLayerList();
+            updatePropertiesPanel();
+            saveHistoryState();
+            requestRender();
+        }
+
+        function deleteBgImage() {
+            state.bgImage = null;
+            state.selectedTarget = null;
+            renderLayerList();
+            updatePropertiesPanel();
+            saveHistoryState();
+            requestRender();
         }
 
         function handleMouseDown(e) {
@@ -979,23 +1199,54 @@
                 return;
             }
 
-            if (!state.userImage) return;
-
             const mousePos = getCanvasMousePos(e);
-            const handle = hitTestHandles(mousePos);
+            const activeT = getActiveTransform();
 
-            if (handle === 'rot') {
-                state.isRotating = true;
-                state.transformStart = { ...state.transform };
-            } else if (handle) {
-                state.isResizing = true;
-                state.activeHandle = handle;
-                state.dragStart = { x: mousePos.x, y: mousePos.y };
-                state.transformStart = { ...state.transform };
-            } else if (hitTestUserImage(mousePos)) {
-                state.isDragging = true;
-                state.dragStart = { x: mousePos.x - state.transform.x, y: mousePos.y - state.transform.y };
+            // Kiểm tra click vào Handle xoay/scale của đối tượng hiện tại
+            if (activeT) {
+                const handle = hitTestHandles(mousePos, activeT);
+                if (handle === 'rot') {
+                    state.isRotating = true;
+                    state.transformStart = { ...activeT };
+                    return;
+                } else if (handle) {
+                    state.isResizing = true;
+                    state.activeHandle = handle;
+                    state.dragStart = { x: mousePos.x, y: mousePos.y };
+                    state.transformStart = { ...activeT };
+                    return;
+                }
             }
+
+            // Hit test chọn Sticker theo thứ tự từ trên xuống dưới
+            for (let i = state.stickers.length - 1; i >= 0; i--) {
+                if (hitTestObject(mousePos, state.stickers[i])) {
+                    state.selectedTarget = { type: 'sticker', index: i };
+                    state.isDragging = true;
+                    state.dragStart = { x: mousePos.x - state.stickers[i].x, y: mousePos.y - state.stickers[i].y };
+                    renderLayerList();
+                    updatePropertiesPanel();
+                    requestRender();
+                    return;
+                }
+            }
+
+            // Hit test Ảnh Nền
+            if (state.bgImage && hitTestObject(mousePos, state.bgTransform)) {
+                state.selectedTarget = { type: 'bg', index: null };
+                state.isDragging = true;
+                state.dragStart = { x: mousePos.x - state.bgTransform.x, y: mousePos.y - state.bgTransform.y };
+                renderLayerList();
+                updatePropertiesPanel();
+                requestRender();
+                return;
+            }
+
+            // Click ra ngoài khoảng trống -> Bỏ chọn
+            state.selectedTarget = null;
+            renderLayerList();
+            updatePropertiesPanel();
+            requestRender();
         }
 
         function handleMouseMove(e) {
@@ -1006,25 +1257,26 @@
                 return;
             }
 
-            if (!state.userImage) return;
+            const activeT = getActiveTransform();
+            if (!activeT) return;
 
             const mousePos = getCanvasMousePos(e);
 
             if (state.isDragging) {
-                state.transform.x = mousePos.x - state.dragStart.x;
-                state.transform.y = mousePos.y - state.dragStart.y;
+                activeT.x = mousePos.x - state.dragStart.x;
+                activeT.y = mousePos.y - state.dragStart.y;
                 updatePropertiesPanel();
                 requestRender();
             } else if (state.isRotating) {
-                const cx = state.transform.x + state.transform.width / 2;
-                const cy = state.transform.y + state.transform.height / 2;
+                const cx = activeT.x + activeT.width / 2;
+                const cy = activeT.y + activeT.height / 2;
                 const rad = Math.atan2(mousePos.y - cy, mousePos.x - cx);
                 let deg = Math.round((rad * 180) / Math.PI) + 90;
-                state.transform.rotation = deg;
+                activeT.rotation = deg;
                 updatePropertiesPanel();
                 requestRender();
             } else if (state.isResizing) {
-                resizeImage(mousePos, e.shiftKey || propAspect.checked);
+                resizeImage(mousePos, e.shiftKey || propAspect.checked, activeT);
                 updatePropertiesPanel();
                 requestRender();
             }
@@ -1068,8 +1320,7 @@
             };
         }
 
-        function hitTestHandles(pos) {
-            const t = state.transform;
+        function hitTestHandles(pos, t) {
             const cx = t.x + t.width / 2;
             const cy = t.y + t.height / 2;
 
@@ -1093,8 +1344,7 @@
             return null;
         }
 
-        function hitTestUserImage(pos) {
-            const t = state.transform;
+        function hitTestObject(pos, t) {
             const cx = t.x + t.width / 2;
             const cy = t.y + t.height / 2;
 
@@ -1107,7 +1357,7 @@
             return Math.abs(lx) <= t.width / 2 && Math.abs(ly) <= t.height / 2;
         }
 
-        function resizeImage(mousePos, keepAspect) {
+        function resizeImage(mousePos, keepAspect, targetTransform) {
             const s = state.transformStart;
             const handle = state.activeHandle;
             let dx = mousePos.x - state.dragStart.x;
@@ -1130,83 +1380,118 @@
             }
 
             if (newW > 5 && newH > 5) {
-                state.transform.width = Math.round(newW);
-                state.transform.height = Math.round(newH);
+                targetTransform.width = Math.round(newW);
+                targetTransform.height = Math.round(newH);
             }
         }
 
-        function centerImage() {
-            if (!state.userImage) return;
-            state.transform.x = Math.round((state.guiWidth - state.transform.width) / 2);
-            state.transform.y = Math.round((state.guiHeight - state.transform.height) / 2);
+        function centerActiveImage() {
+            const t = getActiveTransform();
+            if (!t) return;
+            t.x = Math.round((state.guiWidth - t.width) / 2);
+            t.y = Math.round((state.guiHeight - t.height) / 2);
             updatePropertiesPanel();
             requestRender();
         }
 
-        function fitImageToGui() {
-            if (!state.userImage) return;
-            state.transform.width = state.guiWidth;
-            state.transform.height = state.guiHeight;
-            centerImage();
+        function fitActiveImageToGui() {
+            const t = getActiveTransform();
+            if (!t) return;
+            t.width = state.guiWidth;
+            t.height = state.guiHeight;
+            centerActiveImage();
         }
 
-        function resetTransform() {
-            if (!state.userImage) return;
-            state.transform.width = state.userImage.width;
-            state.transform.height = state.userImage.height;
-            state.transform.rotation = 0;
-            state.transform.opacity = 1;
-            state.transform.flipX = false;
-            state.transform.flipY = false;
-            centerImage();
+        function resetActiveTransform() {
+            const t = getActiveTransform();
+            if (!t) return;
+            t.rotation = 0;
+            t.opacity = 1;
+            t.flipX = false;
+            t.flipY = false;
+            centerActiveImage();
         }
 
-        function deleteImage() {
-            state.userImage = null;
-            saveHistoryState();
-            requestRender();
+        function deleteActiveTarget() {
+            if (!state.selectedTarget) return;
+            if (state.selectedTarget.type === 'bg') {
+                deleteBgImage();
+            } else if (state.selectedTarget.type === 'sticker') {
+                deleteStickerByIndex(state.selectedTarget.index);
+            }
         }
 
         function bindPropertyInputs() {
-            propX.onchange = (e) => { state.transform.x = parseFloat(e.target.value) || 0; requestRender(); };
-            propY.onchange = (e) => { state.transform.y = parseFloat(e.target.value) || 0; requestRender(); };
+            propX.onchange = (e) => { 
+                const t = getActiveTransform(); if (t) { t.x = parseFloat(e.target.value) || 0; requestRender(); }
+            };
+            propY.onchange = (e) => { 
+                const t = getActiveTransform(); if (t) { t.y = parseFloat(e.target.value) || 0; requestRender(); }
+            };
             propW.onchange = (e) => { 
-                state.transform.width = parseFloat(e.target.value) || 10;
-                if (propAspect.checked) state.transform.height = state.transform.width / state.transform.aspectRatio;
-                updatePropertiesPanel(); requestRender(); 
+                const t = getActiveTransform();
+                if (t) {
+                    t.width = parseFloat(e.target.value) || 10;
+                    if (propAspect.checked) t.height = t.width / t.aspectRatio;
+                    updatePropertiesPanel(); requestRender(); 
+                }
             };
             propH.onchange = (e) => { 
-                state.transform.height = parseFloat(e.target.value) || 10;
-                if (propAspect.checked) state.transform.width = state.transform.height * state.transform.aspectRatio;
-                updatePropertiesPanel(); requestRender(); 
+                const t = getActiveTransform();
+                if (t) {
+                    t.height = parseFloat(e.target.value) || 10;
+                    if (propAspect.checked) t.width = t.height * t.aspectRatio;
+                    updatePropertiesPanel(); requestRender(); 
+                }
             };
-            propRot.onchange = (e) => { state.transform.rotation = parseFloat(e.target.value) || 0; requestRender(); };
+            propRot.onchange = (e) => { 
+                const t = getActiveTransform(); if (t) { t.rotation = parseFloat(e.target.value) || 0; requestRender(); }
+            };
             propOpacity.oninput = (e) => {
-                state.transform.opacity = parseFloat(e.target.value);
-                opacityVal.innerText = `${Math.round(state.transform.opacity * 100)}%`;
-                requestRender();
+                const t = getActiveTransform();
+                if (t) {
+                    t.opacity = parseFloat(e.target.value);
+                    opacityVal.innerText = `${Math.round(t.opacity * 100)}%`;
+                    requestRender();
+                }
             };
 
             btnFlipH.onclick = () => {
-                state.transform.flipX = !state.transform.flipX;
-                btnFlipH.classList.toggle('active', state.transform.flipX);
-                requestRender();
+                const t = getActiveTransform();
+                if (t) {
+                    t.flipX = !t.flipX;
+                    btnFlipH.classList.toggle('active', t.flipX);
+                    requestRender();
+                }
             };
             btnFlipV.onclick = () => {
-                state.transform.flipY = !state.transform.flipY;
-                btnFlipV.classList.toggle('active', state.transform.flipY);
-                requestRender();
+                const t = getActiveTransform();
+                if (t) {
+                    t.flipY = !t.flipY;
+                    btnFlipV.classList.toggle('active', t.flipY);
+                    requestRender();
+                }
             };
         }
 
         function updatePropertiesPanel() {
-            propX.value = Math.round(state.transform.x);
-            propY.value = Math.round(state.transform.y);
-            propW.value = Math.round(state.transform.width);
-            propH.value = Math.round(state.transform.height);
-            propRot.value = Math.round(state.transform.rotation);
-            propOpacity.value = state.transform.opacity;
-            opacityVal.innerText = `${Math.round(state.transform.opacity * 100)}%`;
+            const t = getActiveTransform();
+            if (!t) {
+                propX.value = 0; propY.value = 0; propW.value = 0; propH.value = 0;
+                propRot.value = 0; propOpacity.value = 1; opacityVal.innerText = '100%';
+                btnFlipH.classList.remove('active'); btnFlipV.classList.remove('active');
+                return;
+            }
+
+            propX.value = Math.round(t.x);
+            propY.value = Math.round(t.y);
+            propW.value = Math.round(t.width);
+            propH.value = Math.round(t.height);
+            propRot.value = Math.round(t.rotation);
+            propOpacity.value = t.opacity;
+            opacityVal.innerText = `${Math.round(t.opacity * 100)}%`;
+            btnFlipH.classList.toggle('active', t.flipX);
+            btnFlipV.classList.toggle('active', t.flipY);
         }
 
         function setZoom(val) {
@@ -1217,9 +1502,14 @@
 
         function saveHistoryState() {
             const snapshot = JSON.stringify({
-                transform: state.transform,
-                hasUserImage: !!state.userImage,
-                imageSrc: state.userImage ? state.userImage.src : null
+                bgTransform: state.bgTransform,
+                hasBgImage: !!state.bgImage,
+                bgSrc: state.bgImage ? state.bgImage.src : null,
+                selectedTarget: state.selectedTarget,
+                stickers: state.stickers.map(s => ({
+                    ...s,
+                    imgSrc: s.img.src
+                }))
             });
 
             state.history = state.history.slice(0, state.historyIndex + 1);
@@ -1243,17 +1533,43 @@
 
         function restoreHistoryState(jsonStr) {
             const snap = JSON.parse(jsonStr);
-            state.transform = snap.transform;
-            if (snap.hasUserImage && snap.imageSrc) {
+            state.bgTransform = snap.bgTransform;
+            state.selectedTarget = snap.selectedTarget;
+
+            // Restore BG
+            if (snap.hasBgImage && snap.bgSrc) {
                 const img = new Image();
                 img.onload = () => {
-                    state.userImage = img;
-                    updatePropertiesPanel();
+                    state.bgImage = img;
                     requestRender();
                 };
-                img.src = snap.imageSrc;
+                img.src = snap.bgSrc;
             } else {
-                state.userImage = null;
+                state.bgImage = null;
+            }
+
+            // Restore Stickers
+            state.stickers = [];
+            let loadedCount = 0;
+            if (snap.stickers && snap.stickers.length > 0) {
+                snap.stickers.forEach((sData, idx) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.stickers[idx] = {
+                            ...sData,
+                            img: img
+                        };
+                        loadedCount++;
+                        if (loadedCount === snap.stickers.length) {
+                            renderLayerList();
+                            updatePropertiesPanel();
+                            requestRender();
+                        }
+                    };
+                    img.src = sData.imgSrc;
+                });
+            } else {
+                renderLayerList();
                 updatePropertiesPanel();
                 requestRender();
             }
@@ -1268,28 +1584,18 @@
             exportCtx.imageSmoothingEnabled = false;
             exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-            if (state.userImage) {
-                exportCtx.save();
-                exportCtx.globalAlpha = state.transform.opacity;
-
-                const cx = state.transform.x + state.transform.width / 2;
-                const cy = state.transform.y + state.transform.height / 2;
-
-                exportCtx.translate(cx, cy);
-                exportCtx.rotate((state.transform.rotation * Math.PI) / 180);
-                exportCtx.scale(state.transform.flipX ? -1 : 1, state.transform.flipY ? -1 : 1);
-
-                exportCtx.drawImage(
-                    state.userImage,
-                    -state.transform.width / 2,
-                    -state.transform.height / 2,
-                    state.transform.width,
-                    state.transform.height
-                );
-                exportCtx.restore();
+            // 1. Export BG
+            if (state.bgImage) {
+                renderSingleImage(exportCtx, state.bgImage, state.bgTransform);
             }
 
+            // 2. Export GUI
             exportCtx.drawImage(state.guiImage, 0, 0, state.guiWidth, state.guiHeight);
+
+            // 3. Export Stickers
+            state.stickers.forEach(stk => {
+                renderSingleImage(exportCtx, stk.img, stk);
+            });
 
             const activeGui = document.querySelector('.gui-item.active');
             const filename = activeGui ? `${activeGui.dataset.id}.png` : 'custom_gui.png';
