@@ -1,0 +1,60 @@
+{
+  "namespace": "betmc_credit",
+
+  "betmcui_credit_0@betmc_common.empty_stack_panel": {
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "size": [ "100%", "100%c" ],
+    "bindings": [
+      {
+        "binding_type": "view",
+        "source_control_name": "betmc_credit_button_toggle",
+        "source_property_name": "#toggle_state",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "betmc_credit_user_info@betmc_menu_common.betmc_menu_header": {
+          "$betmc_header_text": "CREDIT USER INFO"
+        }
+      },
+      {
+        "asaki_zuki@betmc_menu_common.betmc_credit_user_panel": {
+          "$betmc_credit_user_image": "betmc_res/betmc_credit_user/asaki_zuki",
+          "$betmc_credit_label_controls": [
+            { "betmc_name@betmc_menu_common.betmc_menu_label": { "text": "Asaki Zuki", "$betmc_font_scale_factor": 1.0 }},
+            { "betmc_fb@betmc_menu_common.betmc_menu_label": { "text": "FB: https://www.facebook.com/asakizuki" }},
+            { "betmc_yt@betmc_menu_common.betmc_menu_label": { "text": "YouTube: https://www.youtube.com/@AsakiZuki" }},
+            { "betmc_github@betmc_menu_common.betmc_menu_label": { "text": "GitHub: https://github.com/AsakiYuki" }},
+            { "betmc_dis@betmc_menu_common.betmc_menu_label": { "text": "Discord profile: @asakizuki" }}
+          ]
+        }
+      },
+      {
+        "tlgm_2308@betmc_menu_common.betmc_credit_user_panel": {
+          "$betmc_credit_user_image": "betmc_res/betmc_credit_user/provip19927474",
+          "$betmc_credit_label_controls": [
+            { "betmc_name@betmc_menu_common.betmc_menu_label": { "text": "TLGM 2308", "$betmc_font_scale_factor": 1.0 }},
+            { "betmc_yt@betmc_menu_common.betmc_menu_label": { "text": "Tiktok: https://www.tiktok.com/@provip19927474?_r=1&_t=ZS-9B5xkKEElM7" }},
+            { "betmc_x@betmc_menu_common.betmc_menu_label": { "text": "N" }},
+            { "betmc_mcpedl@betmc_menu_common.betmc_menu_label": { "text": "M" }},
+            { "betmc_dis_server@betmc_menu_common.betmc_menu_label": { "text": "P" }}
+          ]
+        }
+      },
+      {
+        "betmc_padding@betmc_common.empty_panel": {
+          "size": [ 0, 4 ]
+        }
+      },
+      {
+        "betmc_credit_user_info@betmc_menu_common.betmc_menu_header": {
+          "$betmc_header_text": "What feature did I take away from the above user?"
+        }
+      },
+      { "betmc_info_0@betmc_menu_common.betmc_sex_text": { "text": "Chunk postion, Durability item, Exp, Boss bar, Progress precent base code by: Asaki Zuki" }},
+      { "betmc_info_1@betmc_menu_common.betmc_sex_text": { "text": "Custom dialogs, Animation chat base code by: TLGM 2308" }}
+    ]
+  }
+}

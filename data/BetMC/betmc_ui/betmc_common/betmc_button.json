@@ -1,0 +1,493 @@
+{
+  "namespace": "betmc_button",
+
+  "betmc_button_common_assets@common.button": {
+    "$default_button_texture|default": "textures/ui/button_borderless_light",
+    "$hover_button_texture|default": "textures/ui/button_borderless_lighthover",
+    "$pressed_button_texture|default": "textures/ui/button_borderless_lightpressed",
+    "$locked_button_texture|default": "textures/ui/disabledButtonNoBorder",
+    "$default_content_alpha|default": 1,
+    "$hover_content_alpha|default": 1,
+    "locked_control": "locked",
+    "$locked_alpha": 1
+  },
+
+  "betmc_dark_button_assets@common.button": {
+    "$default_button_texture|default": "textures/ui/button_borderless_dark",
+    "$hover_button_texture|default": "textures/ui/button_borderless_darkhover",
+    "$pressed_button_texture|default": "textures/ui/button_borderless_darkpressed",
+    "$locked_button_texture|default": "textures/ui/disabledButtonNoBorder",
+    "locked_control": "locked",
+    "$locked_alpha": 1
+  },
+
+  "betmc_dark_glyph_button@betmc_button.betmc_dark_button_assets": {
+    "$button_content|default": "common.empty_image",
+    "$button_content_offset|default": [ 0, 0 ],
+    "$button_type_panel": "common_buttons.glyph_content_panel",
+    "$default_state|default": false,
+    "$hover_state|default": false,
+    "$pressed_state|default": false,
+    "$locked_state|default": false,
+    "controls": [
+      {
+        "default@betmc_button.dark_glyph_button_default": {}
+      },
+      {
+        "hover@betmc_button.dark_glyph_button_hover": {}
+      },
+      {
+        "pressed@betmc_button.dark_glyph_button_pressed": {}
+      },
+      {
+        "locked@betmc_button.dark_glyph_button_locked": {}
+      }
+    ]
+  },
+
+  "dark_glyph_button_default@betmc_button.betmc_new_ui_button_panel": {
+    "$new_ui_button_texture": "$default_button_texture",
+    "$glyph_color": "$dark_glyph_default_color",
+    "$border_color": "$dark_border_default_color",
+    "$border_layer": 2,
+    "$default_state": true,
+    "$button_press_offset": [ 0, 0 ],
+    "layer": 1
+  },
+
+  "dark_glyph_button_hover@betmc_button.betmc_new_ui_button_panel": {
+    "$new_ui_button_texture": "$hover_button_texture",
+    "$glyph_color": "$dark_glyph_hover_color",
+    "$border_color": "$dark_border_hover_color",
+    "$border_layer": 3,
+    "$hover_state": true,
+    "$button_press_offset": [ 0, 0 ],
+    "layer": 2
+  },
+
+  "dark_glyph_button_pressed@betmc_button.betmc_new_ui_button_panel": {
+    "$new_ui_button_texture": "$pressed_button_texture",
+    "$glyph_color": "$dark_glyph_pressed_color",
+    "$border_color": "$dark_border_pressed_color",
+    "$border_layer": 3,
+    "$pressed_state": true,
+    "$button_press_offset": [ 0, 1 ],
+    "layer": 3
+  },
+
+  "dark_glyph_button_locked@betmc_button.betmc_new_ui_button_panel": {
+    "$new_ui_button_texture": "$locked_button_texture",
+    "$glyph_color": "$dark_glyph_locked_color",
+    "$content_alpha": "$locked_alpha",
+    "$border_color": "$dark_border_locked_color",
+    "$button_image": "common_buttons.locked_button_image",
+    "$border_layer": 1,
+    "$button_press_offset": [ 0, 0 ],
+    "$locked_state": true,
+    "layer": 1
+  },
+
+  "betmc_button_icon_with_label": {
+    "type": "panel",
+    "layer": 2,
+    "controls": [
+      {
+        "betmc_icon@betmc_config.betmc_main_config": {
+          "type": "image",
+          "anchor_from": "left_middle",
+          "anchor_to": "left_middle",
+          "offset": [ 5, 0 ],
+          "texture": "$betmc_button_icon_textures",
+          "size": [ 16, 16],
+          "color": "$betmc_icon_color",
+          "layer": 3
+        }
+      },
+      {
+        "betmc_label@betmc_config.betmc_main_config": {
+          "type": "label",
+          "anchor_from": "left_middle",
+          "anchor_to": "left_middle",
+          "size": [ "default" , 10 ],
+          "max_size": [ "default" , 10 ],
+          "offset": [ 27, -2 ],
+          "text": "$button_text",
+          "font_type": "$betmc_button_text_font_type",
+          "color": "$text_color",
+          "layer": 3
+        }
+      }
+    ]
+  },
+
+  "betmc_new_ui_binding_button_label@betmc_config.betmc_main_config": {
+    "type": "label",
+    "layer": 2,
+    "text": "$button_text",
+    "color": "$text_color",
+    "font_type": "$betmc_button_text_font_type",
+    "font_size": "$button_font_size",
+    "$button_font_scale_factor|default": 1.0,
+    "font_scale_factor": "$button_font_scale_factor",
+    "$button_font_size|default": "normal",
+    "$betmc_new_ui_binding_button_label_offset|default": [ 0, -2 ],
+    "offset": "$betmc_new_ui_binding_button_label_offset",
+    "$anchor|default": "center",
+    "anchor_from": "$anchor",
+    "anchor_to": "$anchor",
+    "shadow": false,
+    "$button_text_size|default": [ "default", "default" ],
+    "size": "$button_text_size",
+    "$button_text_max_size|default": [ "100%", 10 ],
+    "max_size": "$button_text_max_size",
+    "$text_alignment|default": "center",
+    "text_alignment": "$text_alignment",
+    "$tts_section_header|default": "",
+    "tts_section_header": "$tts_section_header",
+    "$button_text_collection_details|default": "none",
+    "$button_text_collection_prefix|default": "",
+    "bindings": [
+      {
+        "binding_type": "$button_text_collection_details",
+        "binding_collection_name": "$button_text_grid_collection_name",
+        "binding_collection_prefix": "$button_text_collection_prefix"
+      },
+      {
+        "binding_type": "$button_text_binding_type",
+        "binding_condition": "$button_binding_condition",
+        "binding_collection_name": "$button_text_grid_collection_name",
+        "binding_name": "$button_text",
+        "binding_name_override": "$button_text"
+      }
+    ]
+  },
+
+  "betmc_button_content_panel@betmc_common.empty_panel": {
+    "offset": "$button_offset",
+    "controls": [
+      {
+        "content@$button_content": {
+          "layer": 2
+        }
+      }
+    ]
+  },
+
+  "betmc_new_ui_button_panel": {
+    "type": "panel",
+    "$button_alpha|default": 1,
+    "layer": 1,
+    "$button_size_override|default": [ "100%", "100%" ],
+    "size": "$button_size_override",
+    "$content_alpha|default": 1,
+    "$button_image|default": "common_buttons.button_image",
+    "$button_image_visible|default": true,
+    "$button_image_size|default": [ "100% - 2px", "100% - 2px" ],
+    "$image_anchor|default": "center",
+    "$image_offset|default": [ 0, 0 ],
+    "$border_visible|default": true,
+    "$border_alpha|default": 1,
+    "$button_anchor_to|default": "center",
+    "$button_anchor_from|default": "center",
+    "anchor_to": "$button_anchor_to",
+    "anchor_from": "$button_anchor_from",
+    "$button_image_fill|default": false,
+    "$button_image_color|default": [ 1.0, 1.0, 1.0 ],
+    "controls": [
+      {
+        "$button_image@$button_image": {
+          "ignored": "(not $button_image_visible)",
+          "size": "$button_image_size",
+          "offset": "$image_offset",
+          "anchor_from": "$image_anchor",
+          "anchor_to": "$image_anchor",
+          "layer": 1,
+          "fill": "$button_image_fill",
+          "color": "$button_image_color"
+        }
+      },
+      {
+        "button_content": {
+          "type": "panel",
+          "$button_content_size|default": [ "100% - 6px", "100% - 6px" ],
+          "size": "$button_content_size",
+          "controls": [
+            {
+              "$button_type_panel@$button_type_panel": {
+                "layer": 3
+              }
+            }
+          ]
+        }
+      },
+      {
+        "border@common_buttons.focus_border": {
+          "color": "$border_color",
+          "layer": "$border_layer",
+          "alpha": "$border_alpha",
+          "ignored": "(not $border_visible)"
+        }
+      }
+    ]
+  },
+
+  "betmc_light_text_button@betmc_button.betmc_button_common_assets": {
+    "$button_offset|default": [ 0, 0 ],
+    "$button_pressed_offset|default": [ 0, 0 ],
+    "$button_text|default": "",
+    "$button_font_size|default": "normal",
+    "$button_font_scale_factor|default": 1.0,
+    "$pressed_alpha|default": 1,
+    "$default_button_alpha|default": 1,
+    "$default_hover_alpha|default": 1,
+    "$default_pressed_alpha|default": 1,
+    "$default_button_pressed_offset|default": [ 0, 1 ],
+
+    "$default_text_color|default": "$light_button_default_text_color",
+    "$hover_text_color|default": "$light_button_hover_text_color",
+    "$pressed_text_color|default": "$light_button_pressed_text_color",
+    "$locked_text_color|default": "$light_button_locked_text_color",
+
+    "$button_text_binding_type|default": "none",
+    "$button_binding_condition|default": "none",
+    "$button_text_grid_collection_name|default": "",
+
+    "$button_type_panel|default": "betmc_button.betmc_new_ui_binding_button_label",
+    "$button_state_panel|default": "betmc_button.betmc_new_ui_button_panel",
+
+    "$default_state|default": false,
+    "$hover_state|default": false,
+    "$pressed_state|default": false,
+    "$locked_state|default": false,
+
+    "controls": [
+      {
+        "default@$button_state_panel": {
+          "$new_ui_button_texture": "$default_button_texture",
+          "$text_color": "$default_text_color",
+          "$secondary_text_color": "$light_button_secondary_default_text_color",
+          "$content_alpha": "$default_content_alpha",
+          "$border_color": "$light_border_default_color",
+          "$border_layer": 2,
+          "$default_state": true,
+          "$button_alpha": "$default_button_alpha",
+          "layer": 1
+        }
+      },
+      {
+        "hover@$button_state_panel": {
+          "$new_ui_button_texture": "$hover_button_texture",
+          "$text_color": "$hover_text_color",
+          "$secondary_text_color": "$light_button_secondary_hover_text_color",
+          "$content_alpha": 1,
+          "$border_color": "$light_border_hover_color",
+          "$border_layer": 4,
+          "$hover_state": true,
+          "$button_alpha": "$default_hover_alpha",
+          "layer": 4
+        }
+      },
+      {
+        "pressed@$button_state_panel": {
+          "$new_ui_button_texture": "$pressed_button_texture",
+          "$text_color": "$pressed_text_color",
+          "$secondary_text_color": "$light_button_secondary_pressed_text_color",
+          "$button_offset|default": "$button_pressed_offset",
+          "$content_alpha": "$pressed_alpha",
+          "$border_color": "$light_border_pressed_color",
+          "$border_layer": 5,
+          "$pressed_state": true,
+          "$button_alpha": "$default_pressed_alpha",
+          "layer": 5
+        }
+      },
+      {
+        "locked@$button_state_panel": {
+          "$new_ui_button_texture": "$locked_button_texture",
+          "$text_color": "$locked_text_color",
+          "$secondary_text_color": "$light_button_secondary_locked_text_color",
+          "$content_alpha": "$locked_alpha",
+          "$border_color": "$light_border_locked_color",
+          "$button_image": "common_buttons.locked_button_image",
+          "$border_layer": 1,
+          "$locked_state": true,
+          "layer": 1
+        }
+      }
+    ]
+  },
+
+  "betmc_light_content_button@betmc_button.betmc_button_common_assets": {
+
+    "$button_offset|default": [ 0, 0 ],
+    "$button_pressed_offset|default": [ 0, 0 ],
+    "$pressed_alpha|default": 1,
+    "$button_type_panel|default": "betmc_button.betmc_button_content_panel",
+    "$button_content|default": "common.empty_panel",
+    "$button_state_panel|default": "betmc_button.betmc_new_ui_button_panel",
+
+    "$default_button_alpha|default": 1,
+    "$default_hover_alpha|default": 1,
+    "$default_pressed_alpha|default": 1,
+    "$border_default_alpha|default": 1,
+
+    "$border_default_layer|default": 2,
+    "$border_hover_layer|default": 3,
+    "$border_pressed_layer|default": 3,
+    "$border_locked_layer|default": 1,
+
+    "$default_state|default": false,
+    "$hover_state|default": false,
+    "$pressed_state|default": false,
+    "$locked_state|default": false,
+    "$default_state_border_visible|default": true,
+    "$hover_state_border_visible|default": true,
+    "$pressed_state_border_visible|default": true,
+    "$locked_state_border_visible|default": true,
+
+    "$default_text_color|default": "$light_button_default_text_color",
+
+    "controls": [
+      {
+        "default@$button_state_panel": {
+          "$new_ui_button_texture": "$default_button_texture",
+          "$text_color": "$default_text_color",
+          "$content_alpha": "$default_content_alpha",
+          "$secondary_text_color": "$light_button_secondary_default_text_color",
+          "$glyph_color": "$light_glyph_default_color",
+          "$border_color": "$light_border_default_color",
+          "$button_alpha": "$default_button_alpha",
+          "$border_visible": "$default_state_border_visible",
+          "$border_layer": "$border_default_layer",
+          "$default_state": true,
+          "$border_alpha": "$border_default_alpha",
+          "layer": 1
+        }
+      },
+      {
+        "hover@$button_state_panel": {
+          "$new_ui_button_texture": "$hover_button_texture",
+          "$text_color": "$light_button_hover_text_color",
+          "$secondary_text_color": "$light_button_secondary_hover_text_color",
+          "$glyph_color": "$light_glyph_hover_color",
+          "$content_alpha": "$hover_content_alpha",
+          "$border_color": "$light_border_hover_color",
+          "$border_visible": "$hover_state_border_visible",
+          "$border_layer": "$border_hover_layer",
+          "$hover_state": true,
+          "$button_alpha": "$default_hover_alpha",
+          "layer": 2
+        }
+      },
+      {
+        "pressed@$button_state_panel": {
+          "$new_ui_button_texture": "$pressed_button_texture",
+          "$text_color": "$light_button_pressed_text_color",
+          "$secondary_text_color": "$light_button_secondary_pressed_text_color",
+          "$glyph_color": "$light_glyph_pressed_color",
+          "$content_alpha": "$pressed_alpha",
+          "$button_offset": "$button_pressed_offset",
+          "$border_color": "$light_border_pressed_color",
+          "$border_visible": "$pressed_state_border_visible",
+          "$border_layer": "$border_pressed_layer",
+          "$button_alpha": "$default_pressed_alpha",
+          "$pressed_state": true,
+          "layer": 3
+        }
+      },
+      {
+        "locked@$button_state_panel": {
+          "$new_ui_button_texture": "$locked_button_texture",
+          "$text_color": "$light_button_locked_text_color",
+          "$secondary_text_color": "$light_button_secondary_locked_text_color",
+          "$glyph_color": "$light_glyph_locked_color",
+          "$content_alpha": "$locked_alpha",
+          "$border_color": "$light_border_locked_color",
+          "$button_image": "common_buttons.locked_button_image",
+          "$border_visible": "$locked_state_border_visible",
+          "$border_layer": "$border_locked_layer",
+          "$locked_state": true,
+          "layer": 1
+        }
+      }
+    ]
+  },
+
+  "betmc_dark_content_button@betmc_button.betmc_dark_button_assets": {
+
+    "$button_offset|default": [ 0, 0 ],
+    "$button_pressed_offset|default": [ 0, 0 ],
+    "$pressed_alpha|default": 1,
+    "$button_type_panel|default": "betmc_button.betmc_button_content_panel",
+    "$button_content|default": "common.empty_panel",
+    "$button_state_panel|default": "betmc_button.betmc_new_ui_button_panel",
+
+    "$default_state|default": false,
+    "$hover_state|default": false,
+    "$pressed_state|default": false,
+    "$locked_state|default": false,
+
+    "$hover_button_image_fill|default": false,
+    "$hover_content_alpha|default": 1,
+    "$hover_button_image_color|default": [ 1.0, 1.0, 1.0 ],
+
+    "controls": [
+      {
+        "default@$button_state_panel": {
+          "$new_ui_button_texture": "$default_button_texture",
+          "$text_color": "$dark_button_default_text_color",
+          "$secondary_text_color": "$dark_button_secondary_default_text_color",
+          "$glyph_color": "$dark_glyph_default_color",
+          "$content_alpha": 1,
+          "$border_color": "$dark_border_default_color",
+          "$border_layer": 2,
+          "$default_state": true,
+          "layer": 1
+        }
+      },
+      {
+        "hover@$button_state_panel": {
+          "$new_ui_button_texture": "$hover_button_texture",
+          "$text_color": "$dark_button_hover_text_color",
+          "$secondary_text_color": "$dark_button_secondary_hover_text_color",
+          "$glyph_color": "$dark_glyph_hover_color",
+          "$content_alpha": "$hover_content_alpha",
+          "$border_color": "$dark_border_hover_color",
+          "$border_layer": 3,
+          "$hover_state": true,
+          "layer": 2,
+          "$button_image_fill": "$hover_button_image_fill",
+          "$button_image_color": "$hover_button_image_color"
+        }
+      },
+      {
+        "pressed@$button_state_panel": {
+          "$new_ui_button_texture": "$pressed_button_texture",
+          "$text_color": "$dark_button_pressed_text_color",
+          "$secondary_text_color": "$dark_button_secondary_pressed_text_color",
+          "$glyph_color": "$dark_glyph_pressed_color",
+          "$content_alpha": "$pressed_alpha",
+          "$button_offset": "$button_pressed_offset",
+          "$border_color": "$dark_border_pressed_color",
+          "$border_layer": 3,
+          "$pressed_state": true,
+          "layer": 3
+        }
+      },
+      {
+        "locked@$button_state_panel": {
+          "$new_ui_button_texture": "$locked_button_texture",
+          "$text_color": "$dark_button_locked_text_color",
+          "$secondary_text_color": "$dark_button_secondary_locked_text_color",
+          "$glyph_color": "$dark_glyph_locked_color",
+          "$content_alpha": "$locked_alpha",
+          "$border_color": "$dark_border_locked_color",
+          "$button_image": "common_buttons.locked_button_image",
+          "$border_layer": 1,
+          "$locked_state": true,
+          "layer": 1
+        }
+      }
+    ]
+  }
+}

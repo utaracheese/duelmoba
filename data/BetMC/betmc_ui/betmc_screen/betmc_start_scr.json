@@ -1,0 +1,216 @@
+{
+  "namespace": "betmc_start",
+
+  "betmc_minecraft_copyright@betmc_config.betmc_main_config": {
+    "type": "label",
+    "color": "$main_header_text_color",
+    "layer": 2,
+    "text": "menu.copyright",
+    "shadow": true,
+    "font_type": "$betmc_start_label_font_type",
+    "font_scale_factor": 0.85
+  },
+
+  "betmc_pack_version@betmc_config.betmc_main_config": {
+    "type": "label",
+    "color": "$main_header_text_color",
+    "layer": 2,
+    "text": "BetMC UI v1-beta 1",
+    "shadow": true,
+    "font_type": "$betmc_start_label_font_type",
+    "font_scale_factor": 0.85
+  },
+
+  "betmc_mc_version@betmc_config.betmc_main_config": {
+    "type": "label",
+    "text": "#text",
+    "font_type": "$betmc_start_label_font_type",
+    "font_scale_factor": 0.85,
+    "localize": false,
+    "shadow": true,
+    "layer": 2,
+    "$betmc_version_type|default": "NULL",
+    "variables": [
+      {
+        "requires": "$trial",
+        "$betmc_version_type": "Trial"
+      },
+      {
+        "requires": "(not $pre_release)",
+        "$betmc_version_type": "Release"
+      },
+      {
+        "requires": "$pre_release",
+        "$betmc_version_type": "Beta/Preview"
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "#development_version"
+      },
+      {
+        "binding_name": "#version"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "('Version: §z' + #version + '§z | ' + ('Build: §z' + #development_version) + '§z | ' + $betmc_version_type)",
+        "target_property_name": "#text"
+      }
+    ]
+  },
+
+  "betmc_main_button@betmc_button.betmc_light_text_button": {
+    "$button_type_panel": "betmc_button.betmc_button_icon_with_label",
+    "$default_button_texture": "betmc_res/betmc_button/betmc_transparent",
+    "$hover_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$locked_button_texture": "betmc_res/betmc_button/betmc_transparent",
+    "$default_text_color": "$chat_text_color",
+    "$border_visible": false,
+    "size": [ 145, 20 ]
+  },
+  
+  "play_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "$play_button_target",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_play",
+    "$button_text": "menu.play"
+  },
+
+  "achievement_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.menu_achievements",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_achievement",
+    "$button_text": "menu.achievements"
+  },
+
+  "dressing_room_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.to_profile_screen",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_dressing_room",
+    "$button_text": "profileScreen.header"
+  },
+
+  "settings_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.menu_settings",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_setting",
+    "$button_text": "menu.settings"
+  },
+
+  "marketplace_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.menu_store",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_maketplace",
+    "$button_text": "menu.store"
+  },
+
+  "exit_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.menu_exit",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_exit",
+    "$button_text": "Exit Game"
+  },
+
+  "menu_button@betmc_start.betmc_main_button": {
+    "$pressed_button_name": "button.menu_buy_game",
+    "$betmc_button_icon_textures": "betmc_res/betmc_icon/betmc_menu",
+    "$button_text": "BetMC Menu"
+  },
+
+  "betmc_start_root": {
+    "type": "panel",
+    "layer": 10,
+    "controls": [
+      {
+        "betmc_button_main@betmc_start.betmc_button_main": {} 
+      },
+      {
+        "betmc_pack_info_main@betmc_start.betmc_pack_info_main": {}
+      }
+    ]
+  },
+
+  "betmc_button_main": {
+    "type": "panel",
+    "offset": [ 0, 0 ],
+    "size": [ "100%c + 8px", "100%c + 8px" ],
+    "anchor_from": "left_middle",
+    "anchor_to": "left_middle",
+    "animation_reset_name": "screen_animation_reset",
+    "anims": [
+      "@betmc_anim.betmc_start_out_anim_push",
+      "@betmc_anim.betmc_start_out_anim_pop",
+      "@betmc_anim.betmc_start_in_anim_push",
+      "@betmc_anim.betmc_start_in_anim_pop"
+    ],
+    "controls": [
+      { 
+        "betmc_button_elments@betmc_start.betmc_button_elments": {}
+      }
+    ]
+  },
+
+  "betmc_pack_info_main": {
+    "type": "panel",
+    "offset": [ 0, 0 ],
+    "size": [ "100%c + 8px", "100%c + 8px" ],
+    "anchor_from": "bottom_left",
+    "anchor_to": "bottom_left",
+    "animation_reset_name": "screen_animation_reset",
+    "anims": [
+      "@betmc_anim.betmc_start_out_anim_push",
+      "@betmc_anim.betmc_start_out_anim_pop",
+      "@betmc_anim.betmc_start_in_anim_push",
+      "@betmc_anim.betmc_start_in_anim_pop"
+    ],
+    "controls": [
+      { 
+        "betmc_pack_info@betmc_start.betmc_pack_info": {}
+      }
+    ]
+  },
+
+  "betmc_pack_info@betmc_common.betmc_stack_vertical_with_controls": {
+    "$betmc_stack_vertical_with_controls_size": [ 145, "100%c" ],
+    "$betmc_stack_vertical_controls": [
+      {
+        "betmc_minecraft_copyright@betmc_start.betmc_minecraft_copyright": {}
+      },
+      {
+        "betmc_pack_version@betmc_start.betmc_pack_version": {}
+      },
+      {
+        "betmc_mc_version@betmc_start.betmc_mc_version": {}
+      }
+    ]
+  },
+
+  "betmc_button_elments@betmc_common.betmc_stack_vertical_with_controls": {
+    "$betmc_stack_vertical_with_controls_size": [ 145, "100%c" ],
+    "$betmc_stack_vertical_controls": [
+      {
+        "play_button@betmc_start.play_button": {}
+      },
+      {
+        "dressing_room_button@betmc_start.dressing_room_button": {}
+      },
+      {
+        "achievement_button@betmc_start.achievement_button": {}
+      },
+      {
+        "settings_button@betmc_start.settings_button": {}
+      },
+      {
+        "marketplace_button@betmc_start.marketplace_button": {
+          "bindings": [
+            {
+              "binding_name": "(not #marketplace_disabled)",
+              "binding_name_override": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "menu_button@betmc_start.menu_button": {}
+      },
+      {
+        "exit_button@betmc_start.exit_button": {}
+      }
+    ]
+  }
+}

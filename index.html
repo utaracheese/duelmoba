@@ -2,168 +2,399 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Minecraft GUI Editor Mobile</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Pack Builder - Auto BetMC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #282828;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin: 0 0 20px 0;
+        }
+        .section-box {
+            background: #333333;
+            border: 1px solid #444;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #81c784;
+            margin-bottom: 12px;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 9px 12px;
+            background: #202020;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            height: 50px;
+        }
+        .sub-text {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+        .version-row {
+            display: flex;
+            gap: 10px;
+        }
+        .version-row input {
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            background: #181818;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid #3c3c3c;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #444;
+            border-radius: 4px;
+            height: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 4px;
+            transition: width 0.1s;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ================= TOP HEADER ================= -->
-    <header class="mobile-header">
-        <button id="btn-open-project" class="header-btn">
-            📁 <span class="btn-text">Project</span>
-        </button>
-        <div class="current-gui-title" id="current-gui-name">anvil.png</div>
-        <button id="btn-fit-screen" class="header-btn-icon" title="Căn giữa màn hình">📐</button>
-    </header>
+<div class="container">
+    <h2>🎮 Minecraft Pack Builder</h2>
 
-    <!-- ================= WORKSPACE CANVAS ================= -->
-    <main class="canvas-viewport" id="viewport">
-        <canvas id="main-canvas"></canvas>
-        <div class="zoom-indicator" id="zoom-text">100%</div>
-    </main>
-
-    <!-- ================= FLOATING BUBBLE (LAYER MANAGER) ================= -->
-    <div id="layer-bubble" class="floating-bubble" title="Mở danh sách Layer">
-        <div class="bubble-inner">
-            <span class="bubble-icon">📚</span>
-            <span class="bubble-badge" id="layer-count-badge">0</span>
+    <!-- CẤU HÌNH MANIFEST -->
+    <div class="section-box">
+        <div class="section-title">⚙️ 1. Cấu hình Pack (manifest.json)</div>
+        <div class="form-group">
+            <label>Tên Pack (Pack Name):</label>
+            <input type="text" id="manifestName" value="Pixel 210 ui">
+        </div>
+        <div class="form-group">
+            <label>Mô tả (Description):</label>
+            <textarea id="manifestDesc">pack by @provip19927474</textarea>
+        </div>
+        <div class="form-group">
+            <label>Phiên bản (Version):</label>
+            <div class="version-row">
+                <input type="text" id="verMajor" value="1">
+                <input type="text" id="verMinor" value="0">
+                <input type="text" id="verPatch" value="0">
+            </div>
+            <div class="sub-text">* UUID sẽ tự động tạo ngẫu nhiên (UUID v4) khi bấm build.</div>
         </div>
     </div>
 
-    <!-- ================= BOTTOM TOOLBAR (CUỘN NGANG) ================= -->
-    <nav class="bottom-toolbar">
-        <div class="toolbar-scroll">
-            <button id="btn-undo" class="tool-btn">↩️ <span>Undo</span></button>
-            <button id="btn-redo" class="tool-btn">↪️ <span>Redo</span></button>
-            <span class="v-divider"></span>
-            
-            <label for="img-upload-input" class="tool-btn tool-btn-purple">
-                🖼️ <span>Thêm ảnh</span>
-            </label>
-            <input type="file" id="img-upload-input" accept="image/*" multiple hidden>
-
-            <button id="btn-ai-remove-bg" class="tool-btn tool-btn-ai">🪄 <span>Xóa nền AI</span></button>
-            <button id="btn-open-props" class="tool-btn">⚙️ <span>Thuộc tính</span></button>
-            <button id="btn-delete" class="tool-btn tool-btn-danger">🗑️ <span>Delete</span></button>
-            
-            <span class="v-divider"></span>
-            <button id="btn-export-png" class="tool-btn tool-btn-green">💾 <span>Export PNG</span></button>
+    <!-- TÀI NGUYÊN MEDIA -->
+    <div class="section-box">
+        <div class="section-title">🎞️ 2. Video Background & Icon</div>
+        <div class="form-group">
+            <label>Tải lên Video (Cắt 71 frame): *</label>
+            <input type="file" id="videoInput" accept="video/*">
+            <div class="sub-text">Cắt đều 71 frame -> betmc_background/betmc_background_frame/</div>
         </div>
-    </nav>
-
-    <!-- ================= MODAL 1: PROJECT TREE OVERLAY ================= -->
-    <div id="modal-project" class="modal-overlay">
-        <div class="modal-sheet modal-project-sheet">
-            <div class="sheet-header">
-                <h3>📁 Cấu trúc GUI Minecraft</h3>
-                <button class="btn-close-modal" id="btn-close-project">✕</button>
-            </div>
-            <div class="sheet-search">
-                <input type="text" id="gui-search-input" placeholder="🔍 Tìm kiếm GUI (ví dụ: anvil, chest...)">
-            </div>
-            <div class="sheet-content-scroll" id="folder-tree-container">
-                <!-- Cây thư mục GUI được render bằng JS -->
-            </div>
+        <div class="form-group">
+            <label>Static Background (Tùy chọn):</label>
+            <input type="file" id="staticInput" accept="image/*">
+            <div class="sub-text">Để trống sẽ tự random 1 trong 71 frame video đã cắt.</div>
+        </div>
+        <div class="form-group">
+            <label>Pack Icon (pack_icon.png):</label>
+            <input type="file" id="iconInput" accept="image/*">
+            <div class="sub-text">Tự động crop & resize chuẩn 300x300.</div>
         </div>
     </div>
 
-    <!-- ================= MODAL 2: LAYER MANAGER OVERLAY ================= -->
-    <div id="modal-layers" class="modal-overlay">
-        <div class="modal-sheet modal-layers-sheet">
-            <div class="sheet-header">
-                <h3>📚 Danh sách Layer</h3>
-                <button class="btn-close-modal" id="btn-close-layers">✕</button>
-            </div>
-            <div class="layer-guide-tip">
-                💡 <b>Bước 1:</b> Chạm chọn 1 layer. <br>
-                💡 <b>Bước 2:</b> Dùng mũi tên ⬆️ / ⬇️ bên dưới để đổi tầng hiển thị.
-            </div>
-            <div class="sheet-content-scroll" id="layers-list-container">
-                <!-- Danh sách layer render tại đây -->
-            </div>
-            <div class="layer-reorder-footer">
-                <button id="btn-layer-up" class="reorder-btn">⬆️ Lên trên</button>
-                <button id="btn-layer-down" class="reorder-btn">⬇️ Xuống dưới</button>
-            </div>
-        </div>
+    <button id="buildBtn" onclick="startBuild()">BẮT ĐẦU BUILD .MCPACK</button>
+
+    <div class="progress-bar-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- ================= BOTTOM SHEET: LAYER PROPERTIES (ẢNH 2) ================= -->
-    <div id="sheet-properties" class="property-bottom-sheet">
-        <div class="sheet-drag-handle" id="prop-drag-close">
-            <span class="handle-bar"></span>
-        </div>
-        <div class="prop-header">
-            <h4>THUỘC TÍNH LAYER</h4>
-            <button class="btn-close-props" id="btn-close-properties">✕</button>
-        </div>
-        
-        <div class="prop-body">
-            <!-- Position -->
-            <div class="prop-group">
-                <label>Position</label>
-                <div class="input-row">
-                    <div class="input-box"><span>X</span><input type="number" id="prop-x" value="0"></div>
-                    <div class="input-box"><span>Y</span><input type="number" id="prop-y" value="0"></div>
-                </div>
-            </div>
+    <div id="status">Sẵn sàng build pack...</div>
+</div>
 
-            <!-- Size -->
-            <div class="prop-group">
-                <label>Size</label>
-                <div class="input-row">
-                    <div class="input-box"><span>W</span><input type="number" id="prop-w" value="100"></div>
-                    <div class="input-box"><span>H</span><input type="number" id="prop-h" value="100"></div>
-                </div>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="prop-aspect" checked> Khóa tỉ lệ (Lock Aspect)
-                </label>
-            </div>
+<script>
+    function generateUUID() {
+        if (window.crypto && window.crypto.randomUUID) {
+            return window.crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 
-            <!-- Transform & Opacity -->
-            <div class="prop-group">
-                <label>Transform & Opacity</label>
-                <div class="input-row">
-                    <div class="input-box">
-                        <span>Rotate (°)</span>
-                        <input type="number" id="prop-rot" value="0">
-                    </div>
-                </div>
-                <div class="opacity-row">
-                    <input type="range" id="prop-opacity" min="0" max="1" step="0.01" value="1">
-                    <span id="opacity-val">100%</span>
-                </div>
-            </div>
+    function log(msg) {
+        const status = document.getElementById('status');
+        status.innerText += `\n${msg}`;
+        status.scrollTop = status.scrollHeight;
+    }
 
-            <!-- Lật ảnh (Flip) -->
-            <div class="prop-group">
-                <label>Lật ảnh (Flip)</label>
-                <div class="input-row">
-                    <button id="btn-flip-h" class="btn-flip">↔️ Flip H</button>
-                    <button id="btn-flip-v" class="btn-flip">↕️ Flip V</button>
-                </div>
-            </div>
+    function setProgress(percent) {
+        const container = document.getElementById('progressContainer');
+        const bar = document.getElementById('progressBar');
+        container.style.display = 'block';
+        bar.style.width = percent + '%';
+    }
 
-            <!-- Thứ tự tầng Layer -->
-            <div class="prop-group">
-                <label>Thứ tự tầng Layer</label>
-                <div class="layer-tip-box" id="layer-status-text">
-                    💡 Chưa chọn layer nào.
-                </div>
-            </div>
-        </div>
-    </div>
+    // Cắt 71 frame từ video
+    async function extract71Frames(videoFile) {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(videoFile);
+            video.muted = true;
+            video.playsInline = true;
 
-    <!-- Canvas ẩn xuất PNG -->
-    <canvas id="export-canvas" style="display:none;"></canvas>
+            video.onloadedmetadata = async () => {
+                const duration = video.duration;
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
 
-    <!-- Loading Xóa nền AI -->
-    <div id="ai-loading" class="ai-loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <div style="font-size: 14px; font-weight: bold; margin-top: 10px;">Đang xóa nền thông minh...</div>
-    </div>
+                const frames = [];
+                const totalFrames = 71;
 
-    <script src="app.js"></script>
+                log(`Đang đọc video (${video.videoWidth}x${video.videoHeight}). Cắt 71 frames...`);
+
+                for (let i = 1; i <= totalFrames; i++) {
+                    const seekTime = (duration / (totalFrames + 1)) * i;
+                    video.currentTime = seekTime;
+
+                    await new Promise(r => video.onseeked = r);
+
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                    
+                    frames.push({
+                        name: `betmc_img_${i}_frame.png`,
+                        blob: blob
+                    });
+
+                    setProgress(Math.round((i / totalFrames) * 60));
+                    if (i % 15 === 0 || i === 71) log(`Đã xuất ${i}/71 frames...`);
+                }
+
+                URL.revokeObjectURL(video.src);
+                resolve(frames);
+            };
+
+            video.onerror = () => reject('Không đọc được file video.');
+        });
+    }
+
+    // Resize Icon 300x300
+    async function processIcon(iconFile) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(iconFile);
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 300;
+                canvas.height = 300;
+                const ctx = canvas.getContext('2d');
+
+                let scale = Math.max(300 / img.width, 300 / img.height);
+                let w = img.width * scale;
+                let h = img.height * scale;
+                let x = (300 - w) / 2;
+                let y = (300 - h) / 2;
+
+                ctx.drawImage(img, x, y, w, h);
+                canvas.toBlob((blob) => {
+                    URL.revokeObjectURL(img.src);
+                    resolve(blob);
+                }, 'image/png');
+            };
+        });
+    }
+
+    // Tạo manifest json
+    function createManifestJson() {
+        const name = document.getElementById('manifestName').value.trim() || "Pixel 210 ui";
+        const desc = document.getElementById('manifestDesc').value.trim() || "";
+        const major = parseInt(document.getElementById('verMajor').value) || 1;
+        const minor = parseInt(document.getElementById('verMinor').value) || 0;
+        const patch = parseInt(document.getElementById('verPatch').value) || 0;
+
+        const manifest = {
+            "format_version": 2,
+            "header": {
+                "name": name,
+                "description": desc,
+                "uuid": generateUUID(),
+                "version": [major, minor, patch],
+                "min_engine_version": [1, 14, 0]
+            },
+            "modules": [
+                {
+                    "type": "resources",
+                    "uuid": generateUUID(),
+                    "version": [major, minor, patch]
+                }
+            ]
+        };
+
+        return {
+            jsonString: JSON.stringify(manifest, null, 4),
+            packName: name
+        };
+    }
+
+    async function startBuild() {
+        const videoInput = document.getElementById('videoInput');
+        const staticInput = document.getElementById('staticInput');
+        const iconInput = document.getElementById('iconInput');
+        const buildBtn = document.getElementById('buildBtn');
+
+        if (!videoInput.files[0]) {
+            alert('Vui lòng chọn video trước!');
+            return;
+        }
+
+        try {
+            buildBtn.disabled = true;
+            document.getElementById('status').innerText = "Đang tải dữ liệu gốc từ data/BetMC.zip...";
+
+            // 1. Tự động đọc và mở BetMC.zip trong tích tắc
+            let zip;
+            try {
+                const res = await fetch('data/BetMC.zip');
+                if (!res.ok) throw new Error("Không tìm thấy file data/BetMC.zip!");
+                const zipBlob = await res.blob();
+                zip = await JSZip.loadAsync(zipBlob);
+                log(" Đã nạp thành công toàn bộ thư mục từ data/BetMC.zip!");
+            } catch (err) {
+                throw new Error("Lỗi đọc data/BetMC.zip! Hãy đảm bảo bạn chạy bằng Live Server và file BetMC.zip nằm trong thư mục data.");
+            }
+
+            // 2. Ghi đè manifest.json mới
+            const manifestData = createManifestJson();
+            zip.file("manifest.json", manifestData.jsonString);
+            log("2. Đã tạo manifest.json mới với UUID ngẫu nhiên.");
+
+            // 3. Cắt 71 frame từ video
+            const frames = await extract71Frames(videoInput.files[0]);
+            frames.forEach(frame => {
+                zip.file(`betmc_background/betmc_background_frame/${frame.name}`, frame.blob);
+            });
+            log("3. Đã thêm 71 frame vào betmc_background/betmc_background_frame/");
+
+            // 4. Xử lý Static background
+            if (staticInput.files[0]) {
+                zip.file("betmc_background/betmc_background_static.png", staticInput.files[0]);
+                log("4. Đã lưu betmc_background_static.png từ file bạn tải.");
+            } else {
+                const randomFrame = frames[Math.floor(Math.random() * frames.length)];
+                zip.file("betmc_background/betmc_background_static.png", randomFrame.blob);
+                log("4. Đã tự động random 1 frame làm betmc_background_static.png.");
+            }
+
+            // 5. Xử lý pack_icon.png
+            if (iconInput.files[0]) {
+                const iconBlob = await processIcon(iconInput.files[0]);
+                zip.file("pack_icon.png", iconBlob);
+                log("5. Đã resize & lưu pack_icon.png (300x300).");
+            } else {
+                const iconBlob = await processIcon(frames[0].blob);
+                zip.file("pack_icon.png", iconBlob);
+                log("5. Lấy frame đầu tiên làm pack_icon.png (300x300).");
+            }
+
+            // 6. Đóng gói ra .mcpack
+            log("6. Đang nén file .mcpack...");
+            setProgress(70);
+
+            const content = await zip.generateAsync({ type: "blob" }, (meta) => {
+                setProgress(70 + Math.round(meta.percent * 0.3));
+            });
+
+            const safeName = manifestData.packName.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            saveAs(content, `${safeName}.mcpack`);
+
+            setProgress(100);
+            log("🎉 XONG! File .mcpack đã hoàn thiện và tự động tải về.");
+
+        } catch (err) {
+            console.error(err);
+            log(" Lỗi: " + err.message);
+        } finally {
+            buildBtn.disabled = false;
+        }
+    }
+</script>
+
 </body>
 </html>

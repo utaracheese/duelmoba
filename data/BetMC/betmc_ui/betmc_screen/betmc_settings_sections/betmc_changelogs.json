@@ -1,0 +1,28 @@
+{
+  "namespace": "betmc_changelog",
+
+  "betmcui_changelog_0@betmc_common.empty_stack_panel": {
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "size": [ "100%", "100%c" ],
+    "bindings": [
+      {
+        "binding_type": "view",
+        "source_control_name": "betmc_changelog_button_toggle",
+        "source_property_name": "#toggle_state",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "v1_0_0@betmc_menu_common.betmc_changelog_version_toggle": {
+          "$betmc_changelog_version": "v1.0.0-beta 1",
+          "$betmc_details_label_controls": [
+            { "betmc_date@betmc_menu_common.betmc_menu_label": { "text": "2024/06/16 | 03:36 GMT+7" }},
+            { "betmc_feature_label_0@betmc_menu_common.betmc_details_label":{ "$betmc_text": "Released the first beta version" }}
+          ]
+        }
+      }
+    ]
+  }
+}

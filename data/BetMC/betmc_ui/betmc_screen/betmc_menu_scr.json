@@ -1,0 +1,98 @@
+{
+  "namespace": "betmc_menu",
+
+  "betmc_menu_button_00@betmc_settings_common.section_toggle_base": {
+    "$toggle_view_binding_name": "betmc_info_button_toggle",
+    "$button_text": "CREATOR INFO"
+  },
+
+  "betmc_menu_button_01@betmc_settings_common.section_toggle_base": {
+    "$toggle_view_binding_name": "betmc_feature_button_toggle",
+    "$button_text": "FEATURE"
+  },
+
+  "betmc_menu_button_02@betmc_settings_common.section_toggle_base": {
+    "$toggle_view_binding_name": "betmc_credit_button_toggle",
+    "$button_text": "CREDIT"
+  },
+
+  "betmc_menu_button_03@betmc_settings_common.section_toggle_base": {
+    "$toggle_view_binding_name": "betmc_changelog_button_toggle",
+    "$button_text": "CHANGELOG"
+  },
+
+  "selector_stack_panel@betmc_common.vertical_stack_panel": {
+    "$default_selector_toggle_index": 0,
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "controls": [
+      {
+        "betmc_menu_button_00@betmc_menu.betmc_menu_button_00": {
+          "$toggle_group_forced_index": 0
+        }
+      },
+      {
+        "betmc_menu_button_01@betmc_menu.betmc_menu_button_01": {
+          "$toggle_group_forced_index": 1
+        }
+      },
+      {
+        "betmc_menu_button_02@betmc_menu.betmc_menu_button_02": {
+          "$toggle_group_forced_index": 2
+        }
+      },
+      {
+        "betmc_menu_button_03@betmc_menu.betmc_menu_button_03": {
+          "$toggle_group_forced_index": 3
+        }
+      }
+    ]
+  },
+
+  "section_content_panels@betmc_common.empty_panel": {
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "size": [ "100% - 4px", "100%c + 4px" ],
+    "offset": [ 2, 0 ],
+    "controls": [
+      {
+        "general_and_controls_sections@betmc_common.empty_stack_panel": {
+          "controls": [
+            {
+              "betmcui_info_0@betmc_info.betmcui_info_0": {
+                "visible": false
+              }
+            },
+            {
+              "betmcui_features_0@betmc_features.betmcui_features_0": {
+                "visible": false
+              }
+            },
+            {
+              "betmcui_credit_0@betmc_credit.betmcui_credit_0": {
+                "visible": false
+              }
+            },
+            {
+              "betmcui_changelog_0@betmc_changelog.betmcui_changelog_0": {
+                "visible": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_menu_content@betmc_common.empty_panel": {
+    "controls": [
+      {
+        "betmc_menu_content_dialog@betmc_dialog.betmc_dialog_no_button": {
+          "$text_name": "BETMC MENU",
+          "$child_control": "betmc_menu_common.betmc_menu_dialog_content",
+          "size": [ "90%", "80%" ]
+        }
+      }
+    ]
+  }
+}

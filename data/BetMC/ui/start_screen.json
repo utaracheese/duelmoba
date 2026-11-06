@@ -1,0 +1,7 @@
+{
+  "namespace": "start",
+  "start_screen@common.base_screen": {
+    "$screen_content": "betmc_start.betmc_start_root",
+    "$screen_bg_content": "betmc_background.betmc_static_background"
+  }
+}

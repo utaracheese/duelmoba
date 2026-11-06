@@ -1,0 +1,17 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "Pixel 210 ui",
+        "description": "pack by @provip19927474",
+        "uuid": "cd5b16a1-2e9e-4770-8398-aca48df4d69b",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 14, 0]
+    },
+    "modules": [
+        {
+            "type": "resources",
+            "uuid": "020b407e-680a-4e17-ab15-7c8a038fafc3",
+            "version": [1, 0, 0]
+        }
+    ]
+}

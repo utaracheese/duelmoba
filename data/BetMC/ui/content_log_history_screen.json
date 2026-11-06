@@ -1,0 +1,19 @@
+{
+  "namespace": "content_log_history",
+
+  "content_log_history_screen@common.base_screen": {
+    "$screen_content": "betmc_content_log.betmc_content_log_panel",
+    "$screen_bg_content": "betmc_background.betmc_static_background",
+    "$use_gradient_renderer": false,
+    "$screen_animations": [
+      "@common.container_screen_exit_animation_push",
+      "@common.container_screen_exit_animation_pop",
+      "@common.container_screen_entrance_animation_push",
+      "@common.container_screen_entrance_animation_pop",
+      "@common.screen_exit_animation_push_fade",
+      "@common.screen_exit_animation_pop_fade",
+      "@common.screen_entrance_animation_push_fade",
+      "@common.screen_entrance_animation_pop_fade"
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "namespace": "betmc_content_log",
+
+	"betmc_content_log_button@betmc_button.betmc_light_text_button": {
+    "$default_button_texture": "betmc_res/betmc_button/betmc_black",
+    "$hover_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$locked_button_texture": "betmc_res/betmc_button/betmc_black",
+    "$default_text_color": "$chat_text_color",
+    "$border_visible": true,
+
+    "size": [ "100%", 20 ]
+  },
+
+  "betmc_copy_button@betmc_content_log.betmc_content_log_button": {
+    "$pressed_button_name": "button.copy_to_clipboard",
+    "$button_text": "contentlog.history.copyToClipboard"
+  },
+
+  "betmc_clear_button@betmc_content_log.betmc_content_log_button": {
+    "$pressed_button_name": "button.clear",
+    "$button_text": "contentlog.history.clear"
+  },
+
+	"betmc_content_log_panel": {
+    "type": "panel",
+    "controls": [
+      {
+        "betmc_content_log_dialog@betmc_dialog.betmc_dialog_two_buttons": {
+          "$text_name": "contentlog.history.title",
+          "$child_control": "content_log_history.main_stack_panel",
+          "$top_button_panel": "betmc_content_log.betmc_copy_button",
+          "$bottom_button_panel": "betmc_content_log.betmc_clear_button",
+          "size": [ "95%", "90%" ]
+        }
+      }
+    ]
+  }
+}

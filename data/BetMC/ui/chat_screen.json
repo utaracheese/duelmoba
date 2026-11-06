@@ -1,0 +1,19 @@
+{
+  "chat_screen@common.base_screen": {
+    "close_on_player_hurt": true,
+    "$screen_content": "betmc_chat.betmc_chat_panel",
+    "$screen_bg_content": "betmc_common.empty_panel",
+    "button_mappings": [
+      {
+        "from_button_id": "button.menu_exit",
+        "to_button_id": "button.chat_menu_cancel",
+        "mapping_type": "global"
+      },
+      {
+        "from_button_id": "button.menu_cancel",
+        "to_button_id": "button.chat_menu_cancel",
+        "mapping_type": "global"
+      }
+    ]
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "namespace": "betmc_menu_common",
+
+  "betmc_menu_label@betmc_config.betmc_main_config": {
+    "type": "label",
+    "font_type": "$betmc_label_font_type",
+    "backup_font_type": "$betmc_label_font_type",
+    "$betmc_font_scale_factor|default": 0.75,
+    "font_scale_factor": "$betmc_font_scale_factor",
+    "$betmc_menu_label_offset|default": [ 0, -1 ],
+    "offset": "$betmc_menu_label_offset",
+    "$betmc_label_color|default": "$chat_text_color",
+    "color": "$betmc_label_color",
+    "shadow": false
+  },
+
+  "betmc_sex_text@betmc_menu_common.betmc_menu_label": {
+    "size": [ "100%", "default" ]
+  },
+
+  "betmc_changelog_toggle_button@betmc_toggle.betmc_dark_content_toggle": {
+    "$default_texture": "betmc_res/betmc_button/betmc_black",
+    "$hover_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_no_hover_texture": "betmc_res/betmc_button/betmc_gray",
+    "$locked_texture": "betmc_res/betmc_button/betmc_black",
+    "$default_text_color": "$chat_text_color",
+    "$hover_text_color": "$chat_text_color",
+    "$default_checked_text_color": "$chat_text_color",
+    "$hover_checked_text_color": "$chat_text_color",
+    "$border_visible": true,
+    "$button_offset": [ 0, 0 ],
+    "$button_content": "betmc_menu_common.betmc_changelog_toggle_button_content",
+    "$toggle_name": "$betmc_changelog_version",
+    "$toggle_view_binding_name": "$betmc_changelog_version",
+    "$toggle_sound": true
+  },
+
+  "betmc_header_background@betmc_common.empty_image": {
+    "size": [ "100%", "20px" ],
+    "offset": [ 0, "-2px" ],
+    "anchor_from": "left_middle",
+    "anchor_to": "left_middle",
+    "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+    "alpha": 0.65,
+    "controls": [
+      {
+        "border@common_buttons.focus_border": {
+          "color": "$chat_text_color",
+          "layer": 2,
+          "alpha": 0.75,
+          "controls": [
+            {
+              "header_label@betmc_menu_common.betmc_menu_label": {
+                "color": "$chat_text_color",
+                "layer": 1,
+                "text_alignment": "center",
+                "max_size": [ "95%", 10 ],
+                "text": "$betmc_header_text"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_menu_header": {
+    "type": "panel",
+    "size": [ "100%", "22px" ],
+    "controls": [
+      { "betmc_header_background@betmc_menu_common.betmc_header_background": {} }
+    ]
+  },
+
+  "betmc_details_label@betmc_common.betmc_stack_horizontal_with_controls": {
+    "$betmc_text|default": "Có cái đầu buồi",
+    "$betmc_stack_horizontal_with_controls_size": [ "100%", "100%c - 8px" ],
+    "min_size": [ "100%", 0 ],
+    "$betmc_stack_horizontal_controls": [
+      {
+        "betmc_image_panel@betmc_common.empty_panel": {
+          "size": [ 10, 10 ],
+          "controls": [
+            {
+              "betmc_image_path@betmc_common.empty_image": {
+                "size": [ 11, 9 ],
+                "texture": "betmc_res/betmc_icon/betmc_chat_right_arrow",
+                "offset": [ 0, 1 ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "betmc_padding@betmc_common.empty_panel": {
+          "size": [ 2, 0 ]
+        }
+      },
+      {
+        "betmc_details_text@betmc_menu_common.betmc_sex_text": {
+          "text": "$betmc_text",
+          "size": [ "100% - 10px", "default" ]
+        }
+      }
+    ]
+  },
+
+  "betmc_scrollable_selector_area_content@betmc_common.empty_panel": {
+    "offset": [ "2px", "2px" ],
+    "size": [ "100% - 4px", "100%c + 4px" ],
+    "controls": [
+      { "betmc_menu_common_content@betmc_menu.selector_stack_panel": {} }
+    ]
+  },
+
+  "betmc_changelog_toggle_button_content@betmc_common.empty_panel": {
+    "size": [ "100%", "100%" ],
+    "controls": [
+      {
+        "betmc_label_stack@betmc_common.betmc_stack_horizontal_with_controls": {
+          "anchor_from": "left_middle",
+          "anchor_to": "left_middle",
+          "offset": [ 2, 0 ],
+          "$betmc_stack_horizontal_with_controls_size": [ "100% - 10px", 10 ],
+          "$betmc_stack_horizontal_controls": [
+            {
+              "betmc_changelog_label@betmc_menu_common.betmc_menu_label": {
+                "text": "('BetMC UI ' + $betmc_changelog_version)"
+              }
+            },
+            {
+              "betmc_padding_0@betmc_common.empty_panel": {
+                "size": [ "fill", 0 ]
+              }
+            },
+            {
+              "betmc_dropdown_chervon@betmc_common.empty_image": {
+                "size": [ 12, 12 ],
+                "texture": "betmc_res/betmc_icon/betmc_down_chevron",
+                "color": "$chat_text_color"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_changelog_version_toggle@betmc_common.empty_stack_panel": {
+    "size": [ "100%", "100%c" ],
+    "$betmc_changelog_version|default": "v1.0.0",
+    "$betmc_details_label_controls|default": [],
+    "controls": [
+      {
+        "betmc_toggle_button@betmc_menu_common.betmc_changelog_toggle_button": {
+          "size": [ "100%", 20 ]
+        }
+      },
+      {
+        "betmc_details_bg@betmc_common.empty_image": {
+          "size": [ "100%", "100%c + 5px" ],
+          "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+          "alpha": 0.55,
+          "controls": [
+            {
+              "betmc_details_label_control@betmc_common.empty_stack_panel": {
+                "size": [ "100% - 4px", "100%c" ],
+                "layer": 10,
+                "controls": "$betmc_details_label_controls"
+              }
+            }
+          ],
+          "bindings": [
+            {
+              "binding_type": "view",
+              "source_control_name": "$betmc_changelog_version",
+              "source_property_name": "#toggle_state",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "bemc_padding@betmc_common.empty_panel": {
+          "size": [ 0, 3 ]
+        }
+      }
+    ]
+  },
+
+  "betmc_credit_user_panel@betmc_common.empty_panel": {
+    "size": [ "100%", 54 ],
+    "layer": 1,
+    "controls": [
+      {
+        "betmc_panel_background@betmc_common.empty_image": {
+          "size": [ "100%", 52 ],
+          "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+          "alpha": 0.5,
+          "layer": 1,
+          "controls": [
+            {
+              "betmc_image_and_label_stack@betmc_common.horizontal_stack_panel": {
+                "anchor_from": "left_middle",
+                "anchor_to": "left_middle",
+                "size": [ "100%cm", "100%cm" ],
+                "offset": [ 2, 0 ],
+                "controls": [
+                  {
+                    "betmc_credit_icon@betmc_common.empty_image": {
+                      "anchor_from": "left_middle",
+                      "anchor_to": "left_middle",
+                      "size": [ 48, 48 ],
+                      "texture": "$betmc_credit_user_image",
+                      "layer": 12,
+                      "controls": [
+                        {
+                          "border_white@common.focus_border_white": {
+                            "anchor_from": "left_middle",
+                            "anchor_to": "left_middle",
+                            "size": [ 48, 48 ],
+                            "layer": 13
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "betmc_paddings_0@betmc_common.empty_panel": {
+                      "size": [ 2, 0 ]
+                    }
+                  },
+                  {
+                    "betmc_credit_label_control@betmc_common.empty_stack_panel": {
+                      "size": [ "100% - 4px", "default" ],
+                      "anchor_from": "left_middle",
+                      "anchor_to": "left_middle",
+                      "layer": 12,
+                      "controls": "$betmc_credit_label_controls"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+
+
+  "betmc_left_side_selector_area@betmc_common.empty_panel": {
+    "offset": [ 2, 0 ],
+    "size": [ "40% - 3px", "100%" ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "layer": 2,
+    "focus_container": true,
+    "use_last_focus": true,
+    "$focus_navigation_mode_override_down|default": "contained",
+    "$focus_navigation_mode_override_up|default": "contained",
+    "$focus_navigation_mode_override_left|default": "",
+    "$focus_navigation_mode_override_right|default": "",
+    "focus_navigation_mode_down": "$focus_navigation_mode_override_down",
+    "focus_navigation_mode_up": "$focus_navigation_mode_override_up",
+    "focus_navigation_mode_left": "$focus_navigation_mode_override_left",
+    "focus_navigation_mode_right": "$focus_navigation_mode_override_right",
+    "controls": [
+      {
+        "scrolling_panel@common.scrolling_panel": {
+          "$scrolling_content": "betmc_menu_common.betmc_scrollable_selector_area_content",
+          "$show_background": false,
+          "$scroll_size": [ "5px", "100% - 4px" ],
+          "$scroll_bar_left_padding_size": [ 1, 0 ]
+        }
+      }
+    ]
+  },
+
+  "betmc_right_side_content_area@betmc_common.empty_panel": {
+    "offset": [ "-1px", 0 ],
+    "size": [ "60% - 8px", "100%" ],
+    "anchor_from": "top_right",
+    "anchor_to": "top_right",
+    "layer": 1,
+    "focus_container": true,
+    "use_last_focus": false,
+    "$focus_navigation_mode_override_down|default": "contained",
+    "$focus_navigation_mode_override_up|default": "contained",
+    "$focus_navigation_mode_override_left|default": "",
+    "$focus_navigation_mode_override_right|default": "",
+    "focus_navigation_mode_down": "$focus_navigation_mode_override_down",
+    "focus_navigation_mode_up": "$focus_navigation_mode_override_up",
+    "focus_navigation_mode_left": "$focus_navigation_mode_override_left",
+    "focus_navigation_mode_right": "$focus_navigation_mode_override_right",
+    "ttsSectionContainer": true,    
+    "controls": [
+      {
+        "control@betmc_common.empty_stack_panel": {
+          "size": [ "100%", "100%" ],
+          "anchor_from": "top_right",
+          "anchor_to": "top_right",
+          "controls": [
+            {
+              "scrolling_panel@common.scrolling_panel": {
+                "size": [ "100%", "fill" ],
+                "$scrolling_content": "betmc_menu.section_content_panels",
+                "$show_background": false,
+                "$scroll_size": [ "5px", "100% - 4px" ],
+                "$scroll_bar_left_padding_size": [ 1, 0 ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_section_divider@betmc_common.empty_image": {
+    "offset": [ "40%", 0 ],
+    "size": [ 1, "100%" ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "layer": 3,
+    "color": [ 0.176, 0.219, 0.227 ],
+    "texture": "betmc_res/betmc_ui_textures/betmc_white_textures"
+  },
+
+  "betmc_menu_dialog_content@betmc_common.empty_panel": {
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "controls": [
+      { "betmc_left_side_selector_area@betmc_menu_common.betmc_left_side_selector_area": {} },
+      { "betmc_right_side_content_area@betmc_menu_common.betmc_right_side_content_area": {} },
+      { "betmc_section_divider@betmc_menu_common.betmc_section_divider": {} }
+    ]
+  }
+}

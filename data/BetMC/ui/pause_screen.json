@@ -1,0 +1,17 @@
+{
+  "namespace": "pause",
+  "pause_screen@common.base_screen": {
+    "variables": [
+      {
+        "requires": "$ignore_edu_pause",
+        "$screen_content": "betmc_pause.betmc_pause_root"
+      },
+      {
+        "requires": "(not $ignore_edu_pause)",
+        "$screen_content": "edu_pause.pause_screen_content"
+      }
+    ],
+    "cache_screen": true,
+    "$screen_bg_content": "betmc_pause.betmc_pause_background"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "namespace": "settings",
+  "settings_screen_base@settings_common.screen_base": {
+    "$use_gradient_renderer": false,
+    "$screen_bg_content": "betmc_background.betmc_setting_static_background",
+    "$selector_stack_panel": "betmc_settings.selector_stack_panel",
+    "$section_content_panels": "betmc_settings.section_content_panels",
+    "$section_header_panels": "betmc_settings.section_header_panels",
+    "$section_footer_panels": "betmc_settings.section_footer_panels",
+    "$screen_animations": [
+      "@common.screen_exit_animation_push_fade",
+      "@common.screen_exit_animation_pop_fade",
+      "@common.screen_entrance_animation_push_fade",
+      "@common.screen_entrance_animation_pop_fade"
+    ]
+  }
+}

@@ -1,0 +1,248 @@
+{
+  "namespace": "betmc_add_server",
+
+  "betmc_edit_box_indent@betmc_common.empty_image": {
+    "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+    "alpha": 0.45,
+    "controls": [
+      {
+        "border@common_buttons.focus_border": {
+          "color": [ 0, 0, 0 ],
+          "alpha": 0.45,
+          "layer": 1
+        }
+      }
+    ]
+  },
+
+  "betmc_edit_box_indent_hover@betmc_common.empty_image": {
+    "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+    "alpha": 0.45,
+    "controls": [
+      {
+        "border@common_buttons.focus_border": {
+          "color": [ 1.0, 1.0, 1.0 ],
+          "alpha": 0.45,
+          "layer": 2
+        }
+      }
+    ]
+  },
+
+  "title_text@betmc_config.betmc_main_config": {
+    "type": "label",
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "text": "#title_text",
+    "offset": [ 2, -1 ],
+    "shadow": false,
+    "size": [ "default", 10 ],
+    "color": "$chat_text_color",
+    "font_type": "$betmc_dialog_font_type",
+    "layer": 4,
+    "bindings": [
+      {
+        "binding_name": "#title_text",
+        "binding_condition": "once"
+      }
+    ]
+  },
+
+  "betmc_add_server_light_text_button@betmc_button.betmc_light_text_button": {
+    "$default_button_texture": "betmc_res/betmc_button/betmc_black",
+    "$hover_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$locked_button_texture": "betmc_res/betmc_button/betmc_black",
+    "$default_text_color": "$chat_text_color",
+    "$border_visible": true
+  },
+
+  "play_button@betmc_add_server.betmc_add_server_light_text_button": {
+    "$pressed_button_name": "button.play_button",
+    "$button_text": "addExternalServerScreen.playButtonLabel",
+    "ignored": "$edit_mode",
+    "bindings": [
+      {
+        "binding_name": "#play_button_enabled",
+        "binding_name_override": "#enabled"
+      }
+    ]
+  },
+
+  "play_disabled_button@betmc_add_server.play_button": {
+    "$text_color": "$light_button_locked_text_color",
+    "bindings": [
+      {
+        "binding_name": "#play_button_disabled",
+        "binding_name_override": "#visible"
+      },
+      {
+        "binding_name": "#play_button_enabled",
+        "binding_name_override": "#enabled"
+      }
+    ]
+  },
+
+  "remove_button@betmc_add_server.betmc_add_server_light_text_button": {
+    "$pressed_button_name": "button.remove_button",
+    "$button_text": "addExternalServerScreen.removeButtonLabel",
+    "visible": "($edit_mode)"
+  },
+
+  "save_button@betmc_add_server.betmc_add_server_light_text_button": {
+    "$pressed_button_name": "button.save_button",
+    "$button_text": "addExternalServerScreen.saveButtonLabel",
+    "bindings": [
+      {
+        "binding_name": "#save_button_enabled",
+        "binding_name_override": "#visible"
+      },
+      {
+        "binding_name": "#save_button_enabled",
+        "binding_name_override": "#enabled"
+      }
+    ]
+  },
+
+  "save_disabled_button@betmc_add_server.save_button": {
+    "$text_color": "$light_button_locked_text_color",
+    "bindings": [
+      {
+        "binding_name": "#save_button_disabled",
+        "binding_name_override": "#visible"
+      },
+      {
+        "binding_name": "#save_button_enabled",
+        "binding_name_override": "#enabled"
+      }
+    ]
+  },
+
+  "betmc_play_and_remove_button@betmc_common.empty_panel": {
+    "layer": 3,
+    "controls": [
+      { "play_button@betmc_add_server.play_button": {} },
+      { "play_disabled_button@betmc_add_server.play_disabled_button": {} },
+      { "remove_button@betmc_add_server.remove_button": {} }
+    ]
+  },
+
+  "betmc_save_server_button@betmc_common.empty_panel": {
+    "layer": 3,
+    "controls": [
+      { "save_button@betmc_add_server.save_button": {} },
+      { "save_disabled_button@betmc_add_server.save_disabled_button": {} }
+    ]
+  },
+
+  "text_edit_group@betmc_common.empty_stack_panel": {
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "size": [ "100%", "100%c + 3px" ],
+    "$max_length|default": 30,
+    "$text_type|default": "ExtendedASCII",
+    "controls": [
+      {
+        "name_label@betmc_config.betmc_main_config": {
+          "type": "label",
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "layer": 1,
+          "offset": [ 2, -1 ],
+          "font_type": "$betmc_label_font_type",
+          "font_scale_factor": 0.75,
+          "size": [ "100%", "10px" ],
+          "text": "$header"
+        }
+      },
+      {
+        "edit_box@common.text_edit_box": {
+          "layer": 2,
+          "$text_background_default": "betmc_add_server.betmc_edit_box_indent",
+          "$text_background_hover": "betmc_add_server.betmc_edit_box_indent_hover",
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "size": [ "100% - 1px", 20 ],
+          "$text_box_name": "$text_box_name",
+          "$text_edit_box_content_binding_name": "$content_binding_name",
+          "max_length": "$max_length",
+          "text_type": "$text_type",
+          "$place_holder_text": "$placeholder_label",
+          "$text_edit_box_binding_condition": "once"
+        }
+      }
+    ]
+  },
+
+  "betmc_add_server_panel@betmc_common.empty_panel": {
+    "layer": 1,
+    "controls": [
+      {
+				"betmc_add_server_screen_dialogs@betmc_dialog.betmc_dialog_two_buttons": {
+          "$use_custom_title_control": true,
+          "$custom_title_label": "betmc_add_server.title_text",
+          "$child_control": "betmc_add_server.betmc_add_server_content_panel",
+          "$top_button_panel": "betmc_add_server.betmc_play_and_remove_button",
+          "$bottom_button_panel": "betmc_add_server.betmc_save_server_button",
+          "size": [ "70%", "60%" ]
+        }
+      }
+    ]
+  },
+
+  "betmc_add_server_content_panel@betmc_common.empty_stack_panel": {
+    "size": [ "100% - 8px", "100%" ],
+    "offset": [ 1, 0 ],
+    "controls": [
+      {
+        "name_edit@betmc_add_server.text_edit_group": {
+          "$header": "addExternalServerScreen.nameTextBoxLabel",
+          "$placeholder_label": "addExternalServerScreen.namePlaceholder",
+          "$text_box_name": "#name_text_box",
+          "$max_length": 16,
+          "$content_binding_name": "#name_text_box_content",
+          "$text_box_tts_header": "addExternalServerScreen.nameTextBoxLabel",
+          "$focus_id": "0_name",
+          "$focus_override_right": "1_ip_edit"
+        }
+      },
+      {
+        "betmc_add_server_edit_stack@betmc_common.betmc_stack_horizontal_with_controls": {
+          "$betmc_stack_horizontal_with_controls_size": [ "50% - 1px", 22 ],
+          "$betmc_stack_horizontal_controls": [
+            {
+              "ip_edit@betmc_add_server.text_edit_group": {
+                "$header": "addExternalServerScreen.ipTextBoxLabel",
+                "$placeholder_label": "addExternalServerScreen.ipPlaceholder",
+                "$text_box_name": "#ip_text_box",
+                "$max_length": 256,
+                "$content_binding_name": "#ip_text_box_content",
+                "$text_box_tts_header": "addExternalServerScreen.ipTextBoxLabel",
+                "$focus_id": "1_ip_edit",
+                "$focus_override_right": "2_port"
+              }
+            },
+            {
+              "betmc_add_sv_edit_padding@betmc_common.empty_panel": {
+                "size": [ 2, 2 ]
+              }
+            },
+            {
+              "port_edit@betmc_add_server.text_edit_group": {
+                "$header": "addExternalServerScreen.portTextBoxLabel",
+                "$placeholder_label": "",
+                "$max_length": 6,
+                "$text_type": "NumberChars",
+                "$text_box_name": "#port_text_box",
+                "$content_binding_name": "#port_text_box_content",
+                "$text_box_tts_header": "addExternalServerScreen.portTextBoxLabel",
+                "$focus_id": "2_port",
+                "$focus_override_right": "0_name"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

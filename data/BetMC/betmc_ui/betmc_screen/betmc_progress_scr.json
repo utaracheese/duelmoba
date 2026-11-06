@@ -1,0 +1,296 @@
+{
+  "namespace": "betmc_progress",
+
+  "betmc_progress_label@betmc_config.betmc_main_config": {
+    "type": "label",
+    "font_type": "$betmc_label_font_type",
+    "backup_font_type": "$betmc_label_font_type",
+    "$betmc_font_scale_factor|default": 0.75,
+    "font_scale_factor": "$betmc_font_scale_factor",
+    "$betmc_progress_text_offset|default": [ 2, -2 ],
+    "offset": "$betmc_progress_text_offset",
+    "color": "$chat_text_color",
+    "shadow": false
+  },
+
+  "betmc_progress_light_text_button@betmc_button.betmc_light_text_button": {
+    "$default_button_texture": "betmc_res/betmc_button/betmc_black",
+    "$hover_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$pressed_button_texture": "betmc_res/betmc_button/betmc_gray",
+    "$locked_button_texture": "betmc_res/betmc_button/betmc_transparent",
+    "$default_text_color": "$chat_text_color",
+    "$border_visible": true
+  },
+
+  "betmc_black_bg@betmc_common.empty_image": {
+    "size": [ "100%", "100%c" ],
+    "texture": "betmc_res/betmc_ui_textures/betmc_black_textures",
+    "alpha": 0.55,
+    "layer": 1,
+    "controls": [
+      {
+        "border@betmc_common.empty_image": {
+          "size": [ "100%", "100%c" ],
+          "texture": "betmc_res/betmc_ui_textures/pause_screen_border",
+          "color": [ 0.0, 0.0, 0.0 ],
+          "alpha": 1.0,
+          "layer": 5
+        }
+      }
+    ]
+  },
+
+  "bottom_cancel_button@betmc_progress.betmc_progress_light_text_button": {
+    "$pressed_button_name": "button.menu_exit",
+    "$button_text": "gui.cancel"
+  },
+
+  "betmc_title_stack_panel@betmc_common.betmc_stack_vertical_with_controls": {
+    "$betmc_stack_vertical_with_controls_size": [ "100%", "100%c" ],
+    "$betmc_stack_vertical_controls": [
+      {
+        "betmc_title_label@betmc_progress.betmc_progress_label": {
+          "$betmc_font_scale_factor": 1.0,
+          "text_alignment": "left",
+          "text": "#title_text",
+          "layer": 5,
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            }
+          ]
+        }
+      },
+      {
+        "betmc_progress_padding@betmc_common.empty_panel": {
+          "size": [ 0, 2 ]
+        }
+      },
+      {
+        "message_screen@betmc_progress.betmc_progress_label": {
+          "text_alignment": "left",
+          "text": "#progress_text",
+          "layer": 5,
+          "bindings": [
+            {
+              "binding_name": "#progress_text"
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_progress_percent_panel@betmc_common.horizontal_stack_panel": {
+    "controls": [
+      {
+        "betmc_mobile_data_label@betmc_progress.betmc_progress_label": {
+          "ignored": "(not ($is_android or $is_ios))",
+          "text": "progressScreen.label.mobileData",
+          "bindings": [
+            {
+              "binding_name": "#mobile_data_icon_visible",
+              "binding_name_override": "#visible",
+              "binding_condition": "once"
+            }
+          ]
+        }
+      },
+      {
+        "betmc_progress_padding@betmc_common.empty_panel": {
+          "ignored": "(not ($is_android or $is_ios))",
+          "size": [ 5, 0 ],
+          "bindings": [
+            {
+              "binding_name": "#mobile_data_icon_visible",
+              "binding_name_override": "#visible",
+              "binding_condition": "once"
+            }
+          ]
+        }
+      },
+      {
+        "progress_loading_spinner@progress.progress_loading_spinner": {
+          "size": [ 8, 8 ],
+          "offset": [ 0, 4 ]
+        }
+      },
+      {
+        "betmc_progress_padding@betmc_common.empty_panel": {
+          "size": [ 3, 0 ]
+        }
+      },
+      {
+        "betmc_progress_percent_label@betmc_progress.betmc_progress_label": {
+          "$betmc_progress_text_offset": [ 2, -3 ],
+          "text": "#text",
+          "layer": 5,
+          "bindings": [
+            {
+              "binding_name": "#loading_bar_current_amount"
+            },
+            {
+              "binding_name": "#loading_bar_total_amount"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(#loading_bar_current_amount / #loading_bar_total_amount * 1000)",
+              "target_property_name": "#betmc_progress_amount_0"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "((#betmc_progress_amount_0 > 99) * 100 + (#betmc_progress_amount_0 > 199) * 100 + (#betmc_progress_amount_0 > 299) * 100 + (#betmc_progress_amount_0 > 399) * 100 + (#betmc_progress_amount_0 > 499) * 100 + (#betmc_progress_amount_0 > 599) * 100 + (#betmc_progress_amount_0 > 699) * 100 + (#betmc_progress_amount_0 > 799) * 100 + (#betmc_progress_amount_0 > 899) * 100 + (#betmc_progress_amount_0 > 999) * 10)",
+              "target_property_name": "#betmc_progress_amount_1"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(#betmc_progress_amount_1 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 9) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 19) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 29) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 39) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 49) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 59) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 69) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 79) * 10 + (#betmc_progress_amount_0 - #betmc_progress_amount_1 > 89) * 10)",
+              "target_property_name": "#betmc_progress_amount_2"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "((#betmc_progress_amount_0 - #betmc_progress_amount_2 > 0) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 1) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 2) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 3) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 4) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 5) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 6) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 7) + (#betmc_progress_amount_0 - #betmc_progress_amount_2 > 8))",
+              "target_property_name": "#betmc_progress_decimal"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "('§z' + #betmc_progress_amount_2 / 10 + '.' + #betmc_progress_decimal + '%%')",
+              "target_property_name": "#text"
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "betmc_progress_loading_bars": {
+    "type": "panel",
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "size": [ "100%", 4 ],
+    "layer": 5,
+    "controls": [
+      {
+        "full_progress_bar_icon@achievement.full_progress_bar_icon_base": {
+          "layer": 2,
+          "bindings": [
+            {
+              "binding_name": "#loading_bar_percentage",
+              "binding_name_override": "#clip_ratio"
+            }
+          ]
+        }
+      },
+      {
+        "empty_progress_bar_icon@achievement.empty_progress_bar_icon": {
+          "layer": 1
+        }
+      }
+    ]
+  },
+
+  "world_modal_progress_panel": {
+    "type": "panel",
+    "anchor_from": "bottom_middle",
+    "anchor_to": "bottom_middle",
+    "size": [ "100%", "100%c" ],
+    "offset": [ 0, -2 ],
+    "controls": [
+      {
+        "betmc_black_bg@betmc_progress.betmc_black_bg": {
+          "size": [ "99%", 35 ],
+          "controls": [
+            {
+              "betmc_progress_percent_stack_panel@betmc_common.betmc_stack_horizontal_with_controls": {
+                "anchor_from": "top_right",
+                "anchor_to": "top_right",
+                "offset": [ -5, 4 ],
+                "$betmc_stack_horizontal_with_controls_size": [ "100%c", "100%c" ],
+                "$betmc_stack_horizontal_controls": [
+                  {
+                    "betmc_progress_percent_panel@betmc_progress.betmc_progress_percent_panel": {}
+                  },
+                  {
+                    "betmc_progress_padding_00@betmc_common.empty_panel": {
+                      "size": [ 85, 0 ],
+                      "bindings": [
+                        {
+                          "binding_name": "#cancel_visible",
+                          "binding_name_override": "#visible"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "modal_button_panel@betmc_progress.bottom_cancel_button": {
+                "anchor_from": "right_middle",
+                "anchor_to": "right_middle",
+                "size": [ 80, 20 ],
+                "offset": [ -5, -2 ],
+                "bindings": [
+                  {
+                    "binding_name": "#cancel_visible",
+                    "binding_name_override": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "main_control": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [ "100% - 4px", "100%c" ],
+                "controls": [
+                  {
+                    "betmc_title_stack_panel@betmc_progress.betmc_title_stack_panel": {
+                    }
+                  },
+                  {
+                    "betmc_progress_padding_0@betmc_common.empty_panel": {
+                      "size": [ 0, 4 ]
+                    }
+                  },
+                  { 
+                    "betmc_progress_loading_bars@betmc_progress.betmc_progress_loading_bars": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "save_world_modal_progress_panel": {
+    "type": "panel",
+    "anchor_from": "bottom_middle",
+    "anchor_to": "bottom_middle",
+    "size": [ "100%", "100%c" ],
+    "offset": [ 0, -2 ],
+    "controls": [
+      {
+        "betmc_black_bg@betmc_progress.betmc_black_bg": {
+          "size": [ "99%", 35 ],
+          "controls": [
+            {
+              "main_control": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [ "100% - 4px", "100%c" ],
+                "controls": [
+                  {
+                    "betmc_title_stack_panel@betmc_progress.betmc_title_stack_panel": {} 
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

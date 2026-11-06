@@ -1,0 +1,50 @@
+{
+  "namespace": "betmc_info",
+
+  "betmcui_info_0@betmc_common.empty_stack_panel": {
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "size": [ "100%", "100%c" ],
+    "bindings": [
+      {
+        "binding_type": "view",
+        "source_control_name": "betmc_info_button_toggle",
+        "source_property_name": "#toggle_state",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "betmc_credit_user_info@betmc_menu_common.betmc_menu_header": {
+          "$betmc_header_text": "CREATOR INFO"
+        }
+      },
+      {
+        "betmc_2411@betmc_menu_common.betmc_credit_user_panel": {
+          "$betmc_credit_user_image": "betmc_res/betmc_credit_user/betmc_2411",
+          "$betmc_credit_label_controls": [
+            { "betmc_name@betmc_menu_common.betmc_menu_label": { "text": "Utara2613", "$betmc_font_scale_factor": 1.0 }},
+            { "betmc_fb@betmc_menu_common.betmc_menu_label": { "text": "TikTok: @utara2613" }},
+            { "betmc_yt@betmc_menu_common.betmc_menu_label": { "text": "TikTok: @utara2610" }},
+            { "betmc_github@betmc_menu_common.betmc_menu_label": { "text": "" }},
+            { "betmc_dis@betmc_menu_common.betmc_menu_label": { "text": "Discord server: https://discord.gg/74QMZmvd3q" }}
+          ]
+        }
+      },
+      {
+        "betmc_padding@betmc_common.empty_panel": {
+          "size": [ 0, 4 ]
+        }
+      },
+      {
+        "betmc_credit_user_info@betmc_menu_common.betmc_menu_header": {
+          "$betmc_header_text": "Utara very dz"
+        }
+      },
+      { "betmc_info_0@betmc_menu_common.betmc_sex_text": { "text": "Thank you for downloading BetMC UI" }},
+      { "betmc_info_0@betmc_menu_common.betmc_sex_text": { "text": "This resource pack is a UI add-on that adds a bit of extra functionality to Minecraft!" }},
+      { "betmc_info_0@betmc_menu_common.betmc_sex_text": { "text": "It does not use any behavior packs and can be used on all but a few servers and multiplayer!" }},
+      { "betmc_info_0@betmc_menu_common.betmc_sex_text": { "text": "§4NOTE: This resource pack is in beta release, it may have bugs in this resource pack." }}
+    ]
+  }
+}

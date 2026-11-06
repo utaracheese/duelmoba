@@ -1,0 +1,39 @@
+{
+  "namespace": "betmc_config",
+  "betmc_main_config": {
+    "$betmc_compass_id_aux|default": 26148864, //ITEM ID AUX
+    "$betmc_clock_id_aux|default": 26279936, //ITEM ID AUX
+    "$betmc_recovery_compass_id_aux|default": 43581440, //ITEM ID AUX
+
+    "$betmc_start_label_font_type|default": "ComicRelief-Bold", //FONT TYPE
+    "$betmc_button_text_font_type|default": "ComicRelief-Bold", //FONT TYPE
+    "$betmc_label_font_type|default": "ComicRelief-Bold", //FONT TYPE
+    "$betmc_dialog_font_type|default": "ComicRelief-Bold", //FONT TYPE
+
+    "$betmc_use_button_icon|default": false, // true/false
+    "$betmc_settings_button_icon_textures|default": "betmc_res/betmc_button/betmc_transparent", // PATH BUTTON SETTING ICON IMAGE
+    "$betmc_button_icon_textures|default":  "betmc_res/betmc_button/betmc_transparent", // PATH BUTTON ICON IMAGE
+    "$betmc_icon_color|default": [ 1.0, 1.0, 1.0], // ICON COLOR R,G,B
+    "$betmc_progress_bg_color|default": [ 0.0, 0.0, 0.0 ], // PROGRESS BG CONTENT COLOR R,G,B
+
+    "$betmc_use_dialog_background|default": true, // true/false
+    "$betmc_use_dialog_broder|default": false, // true/false
+
+    "$use_gradient_renderer|default": true, // true/false | GRADIENT RENDER
+    "$use_setting_black_background_layer|default": true, // true/false | BLACK LAYER SETTING BACKGROUND
+
+    "$use_background_static_customs|default": false, // true/false | MAIN CUSTOM BACKGROUND
+    "$use_setting_background_static_customs|default": false, // true/false | SETTING CUSTOM BACKGROUND
+    "$use_background_animation|default": true, // true/false | BACKGROUND ANIMATION
+    "$betmc_frame_duration|default": 0.04, // FARME DURATION
+
+    "$betmc_back_button_with_label|default": true, // true/false
+
+    "$black_background_layer_alpha|default": 0.65, // ALPHA VALUE
+    "$betmc_color_gradient_renderer|default": [ 0, 0, 0, 0.75 ], // COLOR R, G, B, A
+    "$betmc_scr_backround_path|default": "textures/ui/Black", // PATH IMAGE
+    
+    "$betmc_stack_vertical_with_controls_size|default": [ 0, 0 ], //SIZE PANEL
+    "$betmc_stack_horizontal_with_controls_size|default": [ 0, 0 ] //SIZE PANEL
+  }
+}
