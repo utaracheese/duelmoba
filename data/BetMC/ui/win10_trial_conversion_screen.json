@@ -1,7 +1,0 @@
-{
-  "namespace": "win10_trial_conversion",
-  "win10_trial_conversion_screen@common.base_screen": {
-    "$screen_bg_content": "betmc_background.betmc_static_background_not_use_gradient",
-    "$screen_content": "betmc_menu.betmc_menu_content"
-  }
-}

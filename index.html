@@ -3,35 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Pack Builder - Auto BetMC</title>
+    <title>Minecraft Pack Builder - Multi Tool</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
+            background-color: #141414;
             color: #ffffff;
             margin: 0;
-            padding: 30px;
+            padding: 30px 15px;
             display: flex;
             justify-content: center;
         }
         .container {
             width: 100%;
-            max-width: 650px;
-            background: #282828;
+            max-width: 780px;
+            background: #232323;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
         }
         h2 {
             text-align: center;
             color: #4CAF50;
             margin: 0 0 20px 0;
         }
-        .section-box {
-            background: #333333;
+        /* TABS */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: #333;
             border: 1px solid #444;
+            border-radius: 6px;
+            color: #bbb;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .tab-btn:hover {
+            background: #3d3d3d;
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-box {
+            background: #2e2e2e;
+            border: 1px solid #3e3e3e;
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -41,6 +78,9 @@
             font-weight: bold;
             color: #81c784;
             margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .form-group {
             margin-bottom: 14px;
@@ -54,19 +94,23 @@
             font-size: 13px;
             font-weight: 600;
         }
-        input[type="text"], input[type="file"], textarea {
+        input[type="text"], input[type="number"], input[type="file"], textarea {
             width: 100%;
             padding: 9px 12px;
-            background: #202020;
-            border: 1px solid #555;
+            background: #1a1a1a;
+            border: 1px solid #4f4f4f;
             color: white;
             border-radius: 6px;
             box-sizing: border-box;
             font-family: inherit;
         }
+        input[type="file"] {
+            padding: 6px;
+            font-size: 12px;
+        }
         textarea {
             resize: vertical;
-            height: 50px;
+            height: 60px;
         }
         .sub-text {
             font-size: 11px;
@@ -80,40 +124,107 @@
         .version-row input {
             text-align: center;
         }
-        button {
+        .btn-action {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background-color: #4CAF50;
             border: none;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
             transition: 0.2s;
+            margin-top: 10px;
         }
-        button:hover {
+        .btn-action:hover {
             background-color: #45a049;
         }
-        button:disabled {
+        .btn-action:disabled {
             background-color: #555;
             cursor: not-allowed;
         }
+        .btn-sm {
+            background: #3949AB;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .btn-sm:hover {
+            background: #303F9F;
+        }
+        .btn-add-subpack {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-add-subpack:hover {
+            background: #1976D2;
+        }
+
+        /* Subpack Card */
+        .subpack-card {
+            background: #242424;
+            border: 1px solid #444;
+            border-left: 4px solid #2196F3;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .subpack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .subpack-header span {
+            font-weight: bold;
+            color: #64B5F6;
+        }
+        .btn-delete-subpack {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .subpack-grid-3 {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 10px;
+        }
+        .subpack-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
         #status {
             margin-top: 20px;
             padding: 12px;
-            background: #181818;
+            background: #161616;
             border-radius: 6px;
             font-family: monospace;
             font-size: 12px;
             white-space: pre-wrap;
             max-height: 160px;
             overflow-y: auto;
-            border: 1px solid #3c3c3c;
+            border: 1px solid #333;
         }
         .progress-bar-container {
             width: 100%;
-            background-color: #444;
+            background-color: #383838;
             border-radius: 4px;
             height: 10px;
             margin-top: 15px;
@@ -133,58 +244,151 @@
 <div class="container">
     <h2>🎮 Minecraft Pack Builder</h2>
 
-    <!-- CẤU HÌNH MANIFEST -->
-    <div class="section-box">
-        <div class="section-title">⚙️ 1. Cấu hình Pack (manifest.json)</div>
-        <div class="form-group">
-            <label>Tên Pack (Pack Name):</label>
-            <input type="text" id="manifestName" value="Pixel 210 ui">
-        </div>
-        <div class="form-group">
-            <label>Mô tả (Description):</label>
-            <textarea id="manifestDesc">pack by @provip19927474</textarea>
-        </div>
-        <div class="form-group">
-            <label>Phiên bản (Version):</label>
-            <div class="version-row">
-                <input type="text" id="verMajor" value="1">
-                <input type="text" id="verMinor" value="0">
-                <input type="text" id="verPatch" value="0">
+    <!-- TAB SELECTOR -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('betmc')">🎬 BetMC (Video BG)</button>
+        <button class="tab-btn" onclick="switchTab('manigui')">🗂️ Many GUI (Subpacks)</button>
+    </div>
+
+    <!-- ================= CHẾ ĐỘ 1: BETMC ================= -->
+    <div id="tab-betmc" class="tab-content active">
+        <div class="section-box">
+            <div class="section-title">⚙️ 1. Cấu hình Pack (manifest.json)</div>
+            <div class="form-group">
+                <label>Tên Pack (Pack Name):</label>
+                <input type="text" id="betmc_name" value="Pixel 210 ui">
             </div>
-            <div class="sub-text">* UUID sẽ tự động tạo ngẫu nhiên (UUID v4) khi bấm build.</div>
+            <div class="form-group">
+                <label>Mô tả (Description):</label>
+                <textarea id="betmc_desc">pack by @provip19927474</textarea>
+            </div>
+            <div class="form-group">
+                <label>Phiên bản (Version):</label>
+                <div class="version-row">
+                    <input type="number" id="betmc_verMajor" value="1">
+                    <input type="number" id="betmc_verMinor" value="0">
+                    <input type="number" id="betmc_verPatch" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tên File khi tải về (Không đuôi .mcpack):</label>
+                <input type="text" id="betmc_exportName" placeholder="Để trống sẽ lấy theo Tên Pack">
+            </div>
         </div>
+
+        <div class="section-box">
+            <div class="section-title">🎞️ 2. Video Background & Icon</div>
+            <div class="form-group">
+                <label>Video Background (Cắt 71 frame): *</label>
+                <input type="file" id="videoInput" accept="video/*">
+                <div class="sub-text">Cắt đều 71 frame -> betmc_background/betmc_background_frame/</div>
+            </div>
+            <div class="form-group">
+                <label>Static Background (Tùy chọn):</label>
+                <input type="file" id="staticInput" accept="image/*">
+                <div class="sub-text">Để trống sẽ tự random 1 trong 71 frame video đã cắt.</div>
+            </div>
+            <div class="form-group">
+                <label>Pack Icon (pack_icon.png):</label>
+                <input type="file" id="betmc_iconInput" accept="image/*">
+                <div class="sub-text">Tự động resize chuẩn 300x300. Để trống lấy frame 1.</div>
+            </div>
+        </div>
+
+        <button class="btn-action" id="betmc_buildBtn" onclick="buildBetMC()">BẮT ĐẦU BUILD BETMC .MCPACK</button>
     </div>
 
-    <!-- TÀI NGUYÊN MEDIA -->
-    <div class="section-box">
-        <div class="section-title">🎞️ 2. Video Background & Icon</div>
-        <div class="form-group">
-            <label>Tải lên Video (Cắt 71 frame): *</label>
-            <input type="file" id="videoInput" accept="video/*">
-            <div class="sub-text">Cắt đều 71 frame -> betmc_background/betmc_background_frame/</div>
+    <!-- ================= CHẾ ĐỘ 2: MANY GUI ================= -->
+    <div id="tab-manigui" class="tab-content">
+        <!-- CẤU HÌNH MANIFEST -->
+        <div class="section-box">
+            <div class="section-title">⚙️ 1. Cấu hình Manifest chung</div>
+            <div class="form-group">
+                <label>Tên Pack (Pack Name):</label>
+                <input type="text" id="mg_name" value="10totemwaifu">
+            </div>
+            <div class="form-group">
+                <label>Mô tả (Description):</label>
+                <textarea id="mg_desc">Nho follow tiktok tui nhe : @utara2613</textarea>
+            </div>
+            <div class="subpack-grid-2">
+                <div class="form-group">
+                    <label>Phiên bản Pack (Version):</label>
+                    <div class="version-row">
+                        <input type="number" id="mg_verMajor" value="1">
+                        <input type="number" id="mg_verMinor" value="0">
+                        <input type="number" id="mg_verPatch" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Min Engine Version:</label>
+                    <div class="version-row">
+                        <input type="number" id="mg_minMajor" value="1">
+                        <input type="number" id="mg_minMinor" value="14">
+                        <input type="number" id="mg_minPatch" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TỰ NHẬP SETTING -->
+            <div class="form-group" style="margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="margin: 0;">Cấu hình Settings (Label Text):</label>
+                    <button type="button" class="btn-sm" onclick="syncSettingsText()">⚡ Tự động điền từ danh sách</button>
+                </div>
+                <textarea id="mg_settingsText" placeholder="Nhập chữ hiển thị trong settings (ví dụ: 1. Kurumi 2. Origami...)...">1. Tokisaki Kurumi</textarea>
+                <div class="sub-text">* Bạn có thể tự do chỉnh sửa văn bản này theo ý muốn.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Tên File khi tải về (.mcpack riêng biệt):</label>
+                <input type="text" id="mg_exportName" value="10TotemWaifu_Pack" placeholder="Nhập tên file tải về...">
+                <div class="sub-text">* Tên này là tên file .mcpack tải xuống máy, không ảnh hưởng đến tên trong game.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Pack Icon (pack_icon.png):</label>
+                <input type="file" id="mg_iconInput" accept="image/*">
+                <div class="sub-text">Tự động xử lý kích thước 300x300.</div>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Static Background (Tùy chọn):</label>
-            <input type="file" id="staticInput" accept="image/*">
-            <div class="sub-text">Để trống sẽ tự random 1 trong 71 frame video đã cắt.</div>
+
+        <!-- DANH SÁCH SUBPACKS -->
+        <div class="section-box">
+            <div class="section-title">
+                <span>📂 2. Quản lý Subpacks</span>
+                <button type="button" class="btn-add-subpack" onclick="addSubpack()">+ Thêm Subpack</button>
+            </div>
+            <div id="subpacksList">
+                <!-- Subpacks sẽ render tại đây -->
+            </div>
         </div>
-        <div class="form-group">
-            <label>Pack Icon (pack_icon.png):</label>
-            <input type="file" id="iconInput" accept="image/*">
-            <div class="sub-text">Tự động crop & resize chuẩn 300x300.</div>
-        </div>
+
+        <button class="btn-action" id="mg_buildBtn" onclick="buildManyGUI()">BẮT ĐẦU BUILD MANY GUI .MCPACK</button>
     </div>
 
-    <button id="buildBtn" onclick="startBuild()">BẮT ĐẦU BUILD .MCPACK</button>
-
+    <!-- TIẾN TRÌNH & CONSOLE -->
     <div class="progress-bar-container" id="progressContainer">
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <div id="status">Sẵn sàng build pack...</div>
+    <div id="status">Sẵn sàng thực hiện...</div>
 </div>
 
 <script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        if (tabId === 'betmc') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-betmc').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-manigui').classList.add('active');
+        }
+    }
+
     function generateUUID() {
         if (window.crypto && window.crypto.randomUUID) {
             return window.crypto.randomUUID();
@@ -209,7 +413,32 @@
         bar.style.width = percent + '%';
     }
 
-    // Cắt 71 frame từ video
+    async function processIcon(iconFile) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(iconFile);
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 300;
+                canvas.height = 300;
+                const ctx = canvas.getContext('2d');
+                let scale = Math.max(300 / img.width, 300 / img.height);
+                let w = img.width * scale;
+                let h = img.height * scale;
+                let x = (300 - w) / 2;
+                let y = (300 - h) / 2;
+                ctx.drawImage(img, x, y, w, h);
+                canvas.toBlob((blob) => {
+                    URL.revokeObjectURL(img.src);
+                    resolve(blob);
+                }, 'image/png');
+            };
+        });
+    }
+
+    // ==========================================
+    // LOGIC BETMC
+    // ==========================================
     async function extract71Frames(videoFile) {
         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
@@ -232,16 +461,11 @@
                 for (let i = 1; i <= totalFrames; i++) {
                     const seekTime = (duration / (totalFrames + 1)) * i;
                     video.currentTime = seekTime;
-
                     await new Promise(r => video.onseeked = r);
 
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-                    
-                    frames.push({
-                        name: `betmc_img_${i}_frame.png`,
-                        blob: blob
-                    });
+                    frames.push({ name: `betmc_img_${i}_frame.png`, blob: blob });
 
                     setProgress(Math.round((i / totalFrames) * 60));
                     if (i % 15 === 0 || i === 71) log(`Đã xuất ${i}/71 frames...`);
@@ -250,74 +474,15 @@
                 URL.revokeObjectURL(video.src);
                 resolve(frames);
             };
-
             video.onerror = () => reject('Không đọc được file video.');
         });
     }
 
-    // Resize Icon 300x300
-    async function processIcon(iconFile) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.src = URL.createObjectURL(iconFile);
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 300;
-                canvas.height = 300;
-                const ctx = canvas.getContext('2d');
-
-                let scale = Math.max(300 / img.width, 300 / img.height);
-                let w = img.width * scale;
-                let h = img.height * scale;
-                let x = (300 - w) / 2;
-                let y = (300 - h) / 2;
-
-                ctx.drawImage(img, x, y, w, h);
-                canvas.toBlob((blob) => {
-                    URL.revokeObjectURL(img.src);
-                    resolve(blob);
-                }, 'image/png');
-            };
-        });
-    }
-
-    // Tạo manifest json
-    function createManifestJson() {
-        const name = document.getElementById('manifestName').value.trim() || "Pixel 210 ui";
-        const desc = document.getElementById('manifestDesc').value.trim() || "";
-        const major = parseInt(document.getElementById('verMajor').value) || 1;
-        const minor = parseInt(document.getElementById('verMinor').value) || 0;
-        const patch = parseInt(document.getElementById('verPatch').value) || 0;
-
-        const manifest = {
-            "format_version": 2,
-            "header": {
-                "name": name,
-                "description": desc,
-                "uuid": generateUUID(),
-                "version": [major, minor, patch],
-                "min_engine_version": [1, 14, 0]
-            },
-            "modules": [
-                {
-                    "type": "resources",
-                    "uuid": generateUUID(),
-                    "version": [major, minor, patch]
-                }
-            ]
-        };
-
-        return {
-            jsonString: JSON.stringify(manifest, null, 4),
-            packName: name
-        };
-    }
-
-    async function startBuild() {
+    async function buildBetMC() {
         const videoInput = document.getElementById('videoInput');
         const staticInput = document.getElementById('staticInput');
-        const iconInput = document.getElementById('iconInput');
-        const buildBtn = document.getElementById('buildBtn');
+        const iconInput = document.getElementById('betmc_iconInput');
+        const buildBtn = document.getElementById('betmc_buildBtn');
 
         if (!videoInput.files[0]) {
             alert('Vui lòng chọn video trước!');
@@ -328,68 +493,293 @@
             buildBtn.disabled = true;
             document.getElementById('status').innerText = "Đang tải dữ liệu gốc từ data/BetMC.zip...";
 
-            // 1. Tự động đọc và mở BetMC.zip trong tích tắc
             let zip;
             try {
                 const res = await fetch('data/BetMC.zip');
-                if (!res.ok) throw new Error("Không tìm thấy file data/BetMC.zip!");
+                if (!res.ok) throw new Error("Không tìm thấy data/BetMC.zip!");
                 const zipBlob = await res.blob();
                 zip = await JSZip.loadAsync(zipBlob);
-                log(" Đã nạp thành công toàn bộ thư mục từ data/BetMC.zip!");
+                log("✓ Đã tải BetMC.zip!");
             } catch (err) {
-                throw new Error("Lỗi đọc data/BetMC.zip! Hãy đảm bảo bạn chạy bằng Live Server và file BetMC.zip nằm trong thư mục data.");
+                throw new Error("Lỗi nạp file data/BetMC.zip! Kiểm tra lại file.");
             }
 
-            // 2. Ghi đè manifest.json mới
-            const manifestData = createManifestJson();
-            zip.file("manifest.json", manifestData.jsonString);
-            log("2. Đã tạo manifest.json mới với UUID ngẫu nhiên.");
+            const name = document.getElementById('betmc_name').value.trim() || "Pixel 210 ui";
+            const desc = document.getElementById('betmc_desc').value.trim() || "";
+            const major = parseInt(document.getElementById('betmc_verMajor').value) || 1;
+            const minor = parseInt(document.getElementById('betmc_verMinor').value) || 0;
+            const patch = parseInt(document.getElementById('betmc_verPatch').value) || 0;
 
-            // 3. Cắt 71 frame từ video
+            const manifest = {
+                "format_version": 2,
+                "header": {
+                    "name": name,
+                    "description": desc,
+                    "uuid": generateUUID(),
+                    "version": [major, minor, patch],
+                    "min_engine_version": [1, 14, 0]
+                },
+                "modules": [{ "type": "resources", "uuid": generateUUID(), "version": [major, minor, patch] }]
+            };
+            zip.file("manifest.json", JSON.stringify(manifest, null, 4));
+
             const frames = await extract71Frames(videoInput.files[0]);
             frames.forEach(frame => {
                 zip.file(`betmc_background/betmc_background_frame/${frame.name}`, frame.blob);
             });
-            log("3. Đã thêm 71 frame vào betmc_background/betmc_background_frame/");
 
-            // 4. Xử lý Static background
             if (staticInput.files[0]) {
                 zip.file("betmc_background/betmc_background_static.png", staticInput.files[0]);
-                log("4. Đã lưu betmc_background_static.png từ file bạn tải.");
             } else {
                 const randomFrame = frames[Math.floor(Math.random() * frames.length)];
                 zip.file("betmc_background/betmc_background_static.png", randomFrame.blob);
-                log("4. Đã tự động random 1 frame làm betmc_background_static.png.");
             }
+
+            if (iconInput.files[0]) {
+                const iconBlob = await processIcon(iconInput.files[0]);
+                zip.file("pack_icon.png", iconBlob);
+            } else {
+                const iconBlob = await processIcon(frames[0].blob);
+                zip.file("pack_icon.png", iconBlob);
+            }
+
+            log("Đang nén file .mcpack...");
+            const content = await zip.generateAsync({ type: "blob" }, meta => setProgress(70 + Math.round(meta.percent * 0.3)));
+            
+            const exportName = document.getElementById('betmc_exportName').value.trim() || name;
+            saveAs(content, `${exportName.replace(/[^a-zA-Z0-9_\-]/g, '_')}.mcpack`);
+
+            setProgress(100);
+            log("🎉 XONG! File BetMC .mcpack đã hoàn tất.");
+        } catch (err) {
+            console.error(err);
+            log("❌ Lỗi: " + err.message);
+        } finally {
+            buildBtn.disabled = false;
+        }
+    }
+
+    // ==========================================
+    // LOGIC MANY GUI (SUBPACKS)
+    // ==========================================
+    let subpackCount = 0;
+
+    function createSubpackItem(defaultName = "", defaultFolder = "", tier = 1) {
+        subpackCount++;
+        const id = subpackCount;
+        const div = document.createElement('div');
+        div.className = 'subpack-card';
+        div.id = `subpack-card-${id}`;
+        
+        div.innerHTML = `
+            <div class="subpack-header">
+                <span>Subpack #${id}</span>
+                <button type="button" class="btn-delete-subpack" onclick="removeSubpack(${id})">Xóa</button>
+            </div>
+            <div class="subpack-grid-3">
+                <div class="form-group">
+                    <label>Tên hiển thị (Display Name):</label>
+                    <input type="text" class="sp-name" value="${defaultName || id + '. Subpack Name'}" oninput="autoSuggestFolder(${id})">
+                </div>
+                <div class="form-group">
+                    <label>Tên thư mục (Folder ID):</label>
+                    <input type="text" class="sp-folder" value="${defaultFolder || 'subpack_' + id}">
+                </div>
+                <div class="form-group">
+                    <label>Memory Tier:</label>
+                    <input type="number" class="sp-tier" value="${tier}" min="0">
+                </div>
+            </div>
+            <div class="subpack-grid-2" style="margin-top: 10px;">
+                <div class="form-group">
+                    <label>🖼️ Ảnh Totem (totem.png):</label>
+                    <input type="file" class="sp-totem" accept="image/*">
+                    <div class="sub-text">textures/items/totem.png</div>
+                </div>
+                <div class="form-group">
+                    <label>🖼️ Ảnh UI (dialog_background_opaque.png):</label>
+                    <input type="file" class="sp-ui" accept="image/*">
+                    <div class="sub-text">textures/ui/dialog_background_opaque.png</div>
+                </div>
+            </div>
+        `;
+        return div;
+    }
+
+    function addSubpack(name = "", folder = "", tier = 1) {
+        const container = document.getElementById('subpacksList');
+        container.appendChild(createSubpackItem(name, folder, tier));
+    }
+
+    function removeSubpack(id) {
+        const cards = document.querySelectorAll('.subpack-card');
+        if (cards.length <= 1) {
+            alert("Phải giữ lại ít nhất 1 subpack!");
+            return;
+        }
+        const target = document.getElementById(`subpack-card-${id}`);
+        if (target) target.remove();
+    }
+
+    function autoSuggestFolder(id) {
+        const card = document.getElementById(`subpack-card-${id}`);
+        const nameInput = card.querySelector('.sp-name');
+        const folderInput = card.querySelector('.sp-folder');
+        
+        // Tự động bỏ số thứ tự ở đầu (vd: "1. Tokisaki Kurumi" -> "Tokisaki_Kurumi")
+        let cleanName = nameInput.value.replace(/^\d+[\.\s\-_]+/, '');
+        cleanName = cleanName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        if (cleanName) {
+            folderInput.value = cleanName;
+        }
+    }
+
+    // Nút tiện ích tự đồng bộ tên subpack vào ô Settings text
+    function syncSettingsText() {
+        const cards = document.querySelectorAll('.subpack-card');
+        const list = [];
+        cards.forEach(card => {
+            const name = card.querySelector('.sp-name').value.trim();
+            if (name) list.push(name);
+        });
+        document.getElementById('mg_settingsText').value = list.join(" ");
+    }
+
+    // Khởi tạo subpack đầu tiên
+    addSubpack("1. Tokisaki Kurumi", "Tokisaki_Kurumi", 1);
+
+    async function buildManyGUI() {
+        const buildBtn = document.getElementById('mg_buildBtn');
+        const iconInput = document.getElementById('mg_iconInput');
+        const cards = document.querySelectorAll('.subpack-card');
+
+        if (cards.length === 0) {
+            alert('Vui lòng tạo ít nhất 1 subpack!');
+            return;
+        }
+
+        try {
+            buildBtn.disabled = true;
+            document.getElementById('status').innerText = "Đang nạp file data/manigui.zip...";
+            setProgress(10);
+
+            // 1. Tải zip mẫu
+            let zip;
+            try {
+                const res = await fetch('data/manigui.zip');
+                if (!res.ok) throw new Error("Không tìm thấy file data/manigui.zip!");
+                const zipBlob = await res.blob();
+                zip = await JSZip.loadAsync(zipBlob);
+                log("✓ Đã nạp thành công data/manigui.zip!");
+            } catch (err) {
+                throw new Error("Lỗi nạp file data/manigui.zip! Đảm bảo file nằm đúng trong thư mục data/");
+            }
+
+            setProgress(30);
+
+            // 2. Thu thập subpacks và ghi file ảnh
+            const subpacksManifest = [];
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                let displayName = card.querySelector('.sp-name').value.trim() || `${i+1}. Subpack`;
+                let folderName = card.querySelector('.sp-folder').value.trim() || `subpack_${i+1}`;
+                let tier = parseInt(card.querySelector('.sp-tier').value);
+                if (isNaN(tier)) tier = 1;
+
+                const totemFile = card.querySelector('.sp-totem').files[0];
+                const uiFile = card.querySelector('.sp-ui').files[0];
+
+                subpacksManifest.push({
+                    "folder_name": folderName,
+                    "name": displayName,
+                    "memory_tier": tier
+                });
+
+                // Lưu ảnh totem
+                if (totemFile) {
+                    zip.file(`subpacks/${folderName}/textures/items/totem.png`, totemFile);
+                    log(`+ [${displayName}] textures/items/totem.png`);
+                }
+
+                // Lưu ảnh UI
+                if (uiFile) {
+                    zip.file(`subpacks/${folderName}/textures/ui/dialog_background_opaque.png`, uiFile);
+                    log(`+ [${displayName}] textures/ui/dialog_background_opaque.png`);
+                }
+            }
+
+            // 3. Xử lý Settings do người dùng tự nhập
+            const settingsText = document.getElementById('mg_settingsText').value.trim();
+            const settingsArray = [];
+            if (settingsText) {
+                settingsArray.push({
+                    "type": "label",
+                    "text": settingsText
+                });
+            }
+
+            // 4. Lấy các thông số Manifest
+            const packName = document.getElementById('mg_name').value.trim() || "10totemwaifu";
+            const packDesc = document.getElementById('mg_desc').value.trim() || "";
+            const major = parseInt(document.getElementById('mg_verMajor').value) || 1;
+            const minor = parseInt(document.getElementById('mg_verMinor').value) || 0;
+            const patch = parseInt(document.getElementById('mg_verPatch').value) || 0;
+
+            const minMajor = parseInt(document.getElementById('mg_minMajor').value) || 1;
+            const minMinor = parseInt(document.getElementById('mg_minMinor').value) || 14;
+            const minPatch = parseInt(document.getElementById('mg_minPatch').value) || 0;
+
+            const manifestData = {
+                "format_version": 2,
+                "header": {
+                    "name": packName,
+                    "description": packDesc,
+                    "uuid": generateUUID(),
+                    "version": [major, minor, patch],
+                    "min_engine_version": [minMajor, minMinor, minPatch]
+                },
+                "modules": [
+                    {
+                        "type": "resources",
+                        "uuid": generateUUID(),
+                        "version": [major, minor, patch]
+                    }
+                ],
+                "settings": settingsArray,
+                "subpacks": subpacksManifest
+            };
+
+            zip.file("manifest.json", JSON.stringify(manifestData, null, 4));
+            log("✓ Đã xuất manifest.json mới.");
 
             // 5. Xử lý pack_icon.png
             if (iconInput.files[0]) {
                 const iconBlob = await processIcon(iconInput.files[0]);
                 zip.file("pack_icon.png", iconBlob);
-                log("5. Đã resize & lưu pack_icon.png (300x300).");
-            } else {
-                const iconBlob = await processIcon(frames[0].blob);
-                zip.file("pack_icon.png", iconBlob);
-                log("5. Lấy frame đầu tiên làm pack_icon.png (300x300).");
+                log("✓ Đã resize và lưu pack_icon.png (300x300).");
             }
 
-            // 6. Đóng gói ra .mcpack
-            log("6. Đang nén file .mcpack...");
-            setProgress(70);
+            setProgress(65);
+            log("Đang nén file .mcpack...");
 
+            // 6. Đóng gói ra file với tên riêng
             const content = await zip.generateAsync({ type: "blob" }, (meta) => {
-                setProgress(70 + Math.round(meta.percent * 0.3));
+                setProgress(65 + Math.round(meta.percent * 0.35));
             });
 
-            const safeName = manifestData.packName.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            let exportFileName = document.getElementById('mg_exportName').value.trim();
+            if (!exportFileName) exportFileName = packName;
+            const safeName = exportFileName.replace(/[^a-zA-Z0-9_\-\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
+
             saveAs(content, `${safeName}.mcpack`);
 
             setProgress(100);
-            log("🎉 XONG! File .mcpack đã hoàn thiện và tự động tải về.");
+            log(`🎉 XONG! File ${safeName}.mcpack đã được tạo thành công.`);
 
         } catch (err) {
             console.error(err);
-            log(" Lỗi: " + err.message);
+            log("❌ Lỗi: " + err.message);
         } finally {
             buildBtn.disabled = false;
         }
